@@ -1,12 +1,17 @@
 import { Client, type Room } from "colyseus.js";
 import { Application, Container, Graphics, Text } from "pixi.js";
 import {
+  ADVENTURER_STAT_KEYS,
   NETWORK_MESSAGES,
   PLAYER_RADIUS,
+  RARITY_CONFIG,
   ROOM_NAME,
   WORLD_HEIGHT,
   WORLD_WIDTH,
+  generateAdventurer,
   isWorldStateMessage,
+  type AdventurerStat,
+  type GeneratedAdventurer,
   type MovementInputMessage,
   type PingMessage,
   type PongMessage,
@@ -29,6 +34,19 @@ const worldRoot = document.querySelector<HTMLDivElement>("#pixi-root")!;
 const gameShell = document.querySelector<HTMLElement>(".game-shell")!;
 const worldInfo = document.querySelector<HTMLDivElement>("#world-info")!;
 const playerCount = document.querySelector<HTMLSpanElement>("#player-count")!;
+const generateButton = document.querySelector<HTMLButtonElement>("#generate-button")!;
+const adventurerName = document.querySelector<HTMLHeadingElement>("#adventurer-name")!;
+const adventurerRarity = document.querySelector<HTMLSpanElement>("#adventurer-rarity")!;
+const adventurerLevel = document.querySelector<HTMLElement>("#adventurer-level")!;
+const startingSkillsList = document.querySelector<HTMLUListElement>("#starting-skills-list")!;
+const statValues: Record<AdventurerStat, HTMLElement> = {
+  STR: document.querySelector<HTMLElement>("#stat-str")!,
+  AGI: document.querySelector<HTMLElement>("#stat-agi")!,
+  VIT: document.querySelector<HTMLElement>("#stat-vit")!,
+  DEX: document.querySelector<HTMLElement>("#stat-dex")!,
+  INT: document.querySelector<HTMLElement>("#stat-int")!,
+  LUK: document.querySelector<HTMLElement>("#stat-luk")!
+};
 
 const client = new Client(serverUrl);
 let activeRoom: Room | undefined;
@@ -43,6 +61,36 @@ const statusNames: Record<ConnectionStatus, string> = {
 };
 
 serverAddress.textContent = serverUrl;
+
+function displayAdventurer(adventurer: GeneratedAdventurer): void {
+  adventurerName.textContent = adventurer.name;
+  adventurerRarity.style.setProperty("--rarity-color", adventurer.rarity.colorHex);
+  adventurerName.style.setProperty("--rarity-color", adventurer.rarity.colorHex);
+  adventurerRarity.textContent = "★".repeat(Math.max(1, RARITY_CONFIG.findIndex((rarity) => rarity.name === adventurer.rarity.name) + 1));
+  adventurerRarity.setAttribute("aria-label", `${adventurer.rarity.name} rarity`);
+  adventurerRarity.title = `${adventurer.rarity.name} rarity`;
+  adventurerLevel.textContent = String(adventurer.level);
+
+  for (const stat of ADVENTURER_STAT_KEYS) {
+    statValues[stat].textContent = String(adventurer.baseStats[stat]);
+  }
+
+  startingSkillsList.replaceChildren(...adventurer.startingSkills.map((skill) => {
+    const item = document.createElement("li");
+    const name = document.createElement("span");
+    const tier = document.createElement("span");
+    item.className = "skill-entry";
+    name.className = "skill-name";
+    name.textContent = skill.name;
+    tier.className = "skill-tier";
+    tier.textContent = `Tier ${skill.tier}`;
+    item.append(name, tier);
+    return item;
+  }));
+}
+
+generateButton.addEventListener("click", () => displayAdventurer(generateAdventurer()));
+displayAdventurer(generateAdventurer());
 
 interface PlayerVisual {
   container: Container;

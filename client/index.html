@@ -24,6 +24,44 @@
         <h1 id="game-title">GuildToGlory <span>Online</span></h1>
         <p class="intro">Your next chapter begins at the guild hall.</p>
 
+        <section class="generator" aria-labelledby="generator-title">
+          <div class="generator-heading">
+            <div>
+              <p class="generator-kicker">M3.1 PROTOTYPE</p>
+              <h2 id="generator-title">Adventurer Generator</h2>
+            </div>
+            <button id="generate-button" class="generate-button" type="button">Generate</button>
+          </div>
+
+          <div class="adventurer-result" aria-live="polite" aria-atomic="true">
+            <div class="adventurer-identity">
+              <h3 id="adventurer-name"></h3>
+              <span id="adventurer-rarity" class="rarity-label"></span>
+            </div>
+
+            <dl class="adventurer-details">
+              <div><dt>Level</dt><dd id="adventurer-level"></dd></div>
+            </dl>
+
+            <div class="stats-heading">
+              <h3>Base Stats</h3>
+            </div>
+            <dl class="stat-grid">
+              <div><dt>STR</dt><dd id="stat-str"></dd></div>
+              <div><dt>AGI</dt><dd id="stat-agi"></dd></div>
+              <div><dt>VIT</dt><dd id="stat-vit"></dd></div>
+              <div><dt>DEX</dt><dd id="stat-dex"></dd></div>
+              <div><dt>INT</dt><dd id="stat-int"></dd></div>
+              <div><dt>LUK</dt><dd id="stat-luk"></dd></div>
+            </dl>
+
+            <section class="starting-skills" aria-labelledby="starting-skills-title">
+              <h3 id="starting-skills-title">Starting Skills</h3>
+              <ul id="starting-skills-list" class="skill-list"></ul>
+            </section>
+          </div>
+        </section>
+
         <div id="world-info" class="world-info" hidden>
           <span id="player-count">0 players</span>
           <span>WASD to move</span>

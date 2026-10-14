@@ -190,6 +190,194 @@ h1 span {
   font-size: 15px;
 }
 
+.generator {
+  margin-top: 30px;
+  padding-top: 20px;
+  border-top: 1px solid var(--line);
+}
+
+.generator-heading,
+.adventurer-identity,
+.stats-heading,
+.stats-heading p {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.generator-kicker {
+  margin: 0 0 5px;
+  color: var(--gold);
+  font-size: 8px;
+  font-weight: 600;
+  letter-spacing: 1.4px;
+}
+
+.generator h2,
+.adventurer-identity h3,
+.stats-heading h3 {
+  margin: 0;
+  font-family: "Marcellus", Georgia, serif;
+  font-weight: 400;
+}
+
+.generator h2 {
+  font-size: 21px;
+}
+
+.generate-button {
+  min-height: 38px;
+  padding: 0 16px;
+  border: 1px solid var(--gold);
+  border-radius: 2px;
+  background: var(--gold);
+  color: #17201a;
+  cursor: pointer;
+  font-size: 11px;
+  font-weight: 600;
+  transition: background 160ms ease, color 160ms ease;
+}
+
+.generate-button:hover {
+  background: transparent;
+  color: var(--gold);
+}
+
+.generate-button:focus-visible {
+  outline: 2px solid var(--ink);
+  outline-offset: 3px;
+}
+
+.adventurer-result {
+  margin-top: 18px;
+}
+
+.adventurer-identity {
+  justify-content: flex-start;
+  flex-wrap: wrap;
+  gap: 12px;
+}
+
+.adventurer-identity h3 {
+  color: var(--rarity-color, var(--ink));
+  font-size: 23px;
+}
+
+.rarity-label {
+  display: inline-flex;
+  align-items: center;
+  color: var(--rarity-color, var(--ink));
+  font-size: 18px;
+  font-weight: 600;
+  line-height: 1;
+  white-space: nowrap;
+  text-shadow: 0 0 12px color-mix(in srgb, var(--rarity-color) 35%, transparent);
+}
+
+.adventurer-details {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  gap: 12px;
+  margin: 16px 0 18px;
+  padding: 12px 0;
+  border-block: 1px solid var(--line);
+}
+
+.adventurer-details div,
+.stat-grid div {
+  min-width: 0;
+}
+
+.adventurer-details dt,
+.stat-grid dt {
+  color: var(--muted);
+  font-size: 9px;
+  font-weight: 600;
+  letter-spacing: 1px;
+}
+
+.adventurer-details dd,
+.stat-grid dd {
+  margin: 5px 0 0;
+  color: var(--ink);
+  font-size: 13px;
+  font-weight: 600;
+}
+
+.stats-heading {
+  justify-content: flex-start;
+  margin-bottom: 10px;
+}
+
+.stats-heading h3 {
+  font-size: 17px;
+}
+
+.stat-grid {
+  display: grid;
+  grid-template-columns: repeat(6, minmax(0, 1fr));
+  gap: 8px;
+  margin: 0;
+}
+
+.stat-grid div {
+  padding: 9px 4px;
+  border: 1px solid var(--line);
+  text-align: center;
+}
+
+.stat-grid dd {
+  margin-top: 4px;
+  font-family: "Marcellus", Georgia, serif;
+  font-size: 19px;
+}
+
+.starting-skills {
+  margin-top: 18px;
+  padding-top: 14px;
+  border-top: 1px solid var(--line);
+}
+
+.starting-skills h3 {
+  margin: 0 0 10px;
+  font-family: "Marcellus", Georgia, serif;
+  font-size: 17px;
+  font-weight: 400;
+}
+
+.skill-list {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 6px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.skill-entry {
+  display: flex;
+  min-width: 0;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  padding: 8px 9px;
+  border: 1px solid var(--line);
+  background: rgb(12 20 18 / 34%);
+}
+
+.skill-name {
+  overflow-wrap: anywhere;
+  color: var(--ink);
+  font-size: 11px;
+  font-weight: 600;
+}
+
+.skill-tier {
+  flex: 0 0 auto;
+  color: var(--gold);
+  font-size: 9px;
+}
+
 .connection {
   display: flex;
   align-items: flex-start;
@@ -334,6 +522,40 @@ h1 span {
     left: 12px;
     width: min(320px, calc(100% - 24px));
     padding: 14px;
+  }
+
+  .generator {
+    margin-top: 24px;
+  }
+
+  .game-shell.is-connected .generator {
+    margin-top: 18px;
+    padding-top: 14px;
+  }
+
+  .generator h2 {
+    font-size: 18px;
+  }
+
+  .adventurer-details {
+    gap: 8px;
+  }
+
+  .stat-grid {
+    gap: 5px;
+  }
+
+  .skill-list {
+    gap: 5px;
+  }
+
+  .skill-entry {
+    gap: 5px;
+    padding: 7px 6px;
+  }
+
+  .skill-name {
+    font-size: 10px;
   }
 
   .bottom-bar {
