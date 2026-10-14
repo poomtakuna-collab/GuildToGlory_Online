@@ -37,8 +37,8 @@ npm run build
 
 ## Workspaces
 
-- `client/`: PixiJS start screen and Vite browser client
-- `server/`: Colyseus server and connection test room
-- `shared/`: TypeScript network message names and payload contracts
+- `client/`: PixiJS 2D world and Vite browser client
+- `server/`: Colyseus world room and authoritative movement
+- `shared/`: TypeScript world/player types and network message contracts
 
-The server validates incoming network messages and owns server-side behavior. This foundation does not implement characters, maps, guild systems, combat, or persistence.
+The current world uses placeholder graphics and supports shared rooms, WASD movement, and synchronized player positions. Combat, guilds, parties, inventory, and persistence are not implemented yet.

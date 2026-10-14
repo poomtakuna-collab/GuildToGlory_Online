@@ -128,6 +128,39 @@ a {
   animation: arrive 650ms ease-out both;
 }
 
+.game-shell.is-connected .start-panel {
+  position: absolute;
+  top: 100px;
+  left: clamp(20px, 5vw, 76px);
+  width: min(340px, calc(100% - 40px));
+  margin: 0;
+  padding: 18px;
+  border: 1px solid var(--line);
+  background: rgb(16 26 24 / 91%);
+}
+
+.game-shell.is-connected .eyebrow,
+.game-shell.is-connected h1,
+.game-shell.is-connected .intro,
+.game-shell.is-connected .server-address {
+  display: none;
+}
+
+.world-info {
+  justify-content: space-between;
+  margin: 0 0 12px;
+  color: #c2c9bc;
+  font-size: 11px;
+}
+
+.world-info:not([hidden]) {
+  display: flex;
+}
+
+.world-info span:first-child {
+  color: var(--gold);
+}
+
 .eyebrow {
   margin: 0 0 18px;
   color: var(--gold);
@@ -224,6 +257,11 @@ h1 span {
   transition: background 160ms ease, color 160ms ease;
 }
 
+.game-shell.is-connected .connect-button {
+  min-height: 38px;
+  margin-top: 12px;
+}
+
 .connect-button:hover:not(:disabled) {
   background: transparent;
   color: var(--gold);
@@ -289,6 +327,13 @@ h1 span {
   .start-panel {
     margin-inline: 20px;
     padding-block: 42px;
+  }
+
+  .game-shell.is-connected .start-panel {
+    top: 78px;
+    left: 12px;
+    width: min(320px, calc(100% - 24px));
+    padding: 14px;
   }
 
   .bottom-bar {
