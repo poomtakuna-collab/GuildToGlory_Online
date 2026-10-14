@@ -42,6 +42,15 @@ describe("generateAdventurer", () => {
     expect(adventurer.baseStats).toEqual({ STR: 30, AGI: 30, VIT: 7, DEX: 1, INT: 1, LUK: 1 });
   });
 
+  it("generates traits independently of rarity and Base Stats", () => {
+    const common = generateAdventurer(() => 0.1, [RARITY_CONFIG[0]!], () => 0);
+    const legendary = generateAdventurer(() => 0.9, [RARITY_CONFIG[4]!], () => 0);
+
+    expect(common.rarity.name).not.toBe(legendary.rarity.name);
+    expect(common.baseStats).not.toEqual(legendary.baseStats);
+    expect(common.traits.map((trait) => trait.id)).toEqual(legendary.traits.map((trait) => trait.id));
+  });
+
   it.each([
     [0, "Common"],
     [0.2499, "Common"],

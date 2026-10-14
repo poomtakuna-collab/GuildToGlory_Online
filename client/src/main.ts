@@ -15,6 +15,7 @@ import {
   type MovementInputMessage,
   type PingMessage,
   type PongMessage,
+  type TraitDefinition,
   type WorldPlayer,
   type WorldStateMessage
 } from "@guild-to-glory/shared";
@@ -39,6 +40,7 @@ const adventurerName = document.querySelector<HTMLHeadingElement>("#adventurer-n
 const adventurerRarity = document.querySelector<HTMLSpanElement>("#adventurer-rarity")!;
 const adventurerLevel = document.querySelector<HTMLElement>("#adventurer-level")!;
 const startingSkillsList = document.querySelector<HTMLUListElement>("#starting-skills-list")!;
+const traitList = document.querySelector<HTMLUListElement>("#trait-list")!;
 const statValues: Record<AdventurerStat, HTMLElement> = {
   STR: document.querySelector<HTMLElement>("#stat-str")!,
   AGI: document.querySelector<HTMLElement>("#stat-agi")!,
@@ -85,6 +87,27 @@ function displayAdventurer(adventurer: GeneratedAdventurer): void {
     tier.className = "skill-tier";
     tier.textContent = `Tier ${skill.tier}`;
     item.append(name, tier);
+    return item;
+  }));
+
+  if (adventurer.traits.length === 0) {
+    const emptyMessage = document.createElement("li");
+    emptyMessage.className = "trait-empty";
+    emptyMessage.textContent = "No Traits";
+    traitList.replaceChildren(emptyMessage);
+    return;
+  }
+
+  traitList.replaceChildren(...adventurer.traits.map((trait: TraitDefinition) => {
+    const item = document.createElement("li");
+    const name = document.createElement("span");
+    const effects = document.createElement("span");
+    item.className = `trait-item trait-${trait.type}`;
+    name.className = "trait-name";
+    name.textContent = trait.name;
+    effects.className = "trait-effects";
+    effects.textContent = trait.effects.map((effect) => effect.description).join(" · ");
+    item.append(name, effects);
     return item;
   }));
 }

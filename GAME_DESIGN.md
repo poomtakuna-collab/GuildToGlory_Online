@@ -73,6 +73,51 @@
 
 - Stat brackets 1–10 ถึง 91–100 ให้ Tier ที่มีตัวอักษรเดียวกับช่วงสิบเป็น Tier ที่มี Weight สูงสุด ตั้งแต่ A ถึง J ตามลำดับ
 
+### ค่าต้นแบบ M3.3 Trait Generator V1 เท่านั้น
+
+กฎต่อไปนี้เป็น Prototype V1 สำหรับ Trait Generator ของ M3.3 เท่านั้น ไม่ใช่กฎถาวรหรือค่าที่สรุปสำหรับเกมจริง; ระบบนี้สร้างข้อมูล Traits แต่ยังไม่ประยุกต์ผลกับ Stats, Damage, HP, AP หรือ Combat:
+
+- Trait แต่ละรายการเก็บ Unique ID, Name, Category, Type (`positive` หรือ `negative`), Individual Roll Probability, Description, Structured Gameplay Effects หนึ่งรายการขึ้นไป และรายการ ID ของ Traits ที่ขัดแย้งกัน
+- Registry เป็นศูนย์กลางข้อมูลและเพิ่ม Traits ใหม่ได้โดยไม่ต้องแก้ Generator; ค่า Effect เป็นข้อมูลเท่านั้น ไม่ใช่การคำนวณ Gameplay
+- Trait ทั้ง 30 รายการใน Prototype ใช้ Initial roll probability 8% ต่อรายการ โดยค่า probability ปรับแยกเป็นราย Trait ได้
+- ทุกครั้งที่ Generate ให้ Shuffle Registry แล้ว Roll แต่ละ Trait แยกจากกัน; หาก Trait ขัดแย้งกับ Trait ที่เลือกแล้ว ให้ข้ามรายการนั้น; ID ซ้ำห้ามถูกเลือกซ้ำ
+- ไม่มีจำนวน Traits ขั้นต่ำหรือสูงสุดที่กำหนดไว้; จำนวนสูงสุดมาจากรายการใน Registry และกฎ Conflict เท่านั้น
+- การสุ่ม Traits เป็นอิสระจาก Rarity, Stats และ Skills และไม่มี Positive/Negative point budget
+- Trait ที่ขัดแย้งกันเป็นคู่ตรงข้ามดังตาราง; คู่ Conflict มีผลทั้งสองทิศทาง:
+
+| ID | Trait | Category | Type | Structured effect | Conflicts with |
+|---|---|---|---|---|---|
+| `strong` | Strong | offense | positive | `meleeDamage`, percentage +2% | `weak` |
+| `agile` | Agile | mobility | positive | `movementSpeed`, percentage +2% | `clumsy` |
+| `tough` | Tough | survivability | positive | `maxHp`, percentage +2% | `frail` |
+| `brave` | Brave | resistance | positive | `fearResistance`, percentage +5% | `coward` |
+| `fast-learner` | Fast Learner | progression | positive | `experienceGain`, percentage +2% | `slow-learner` |
+| `keen-eyes` | Keen Eyes | perception | positive | `visionRange`, percentage +3% | `short-sighted` |
+| `animal-lover` | Animal Lover | creatures | positive | `beastDamageTaken`, percentage -5% | `beast-phobia` |
+| `beast-hunter` | Beast Hunter | creatures | positive | `beastDamage`, percentage +5% | `poor-hunter` |
+| `fire-resistant` | Fire Resistant | elements | positive | `fireDamageTaken`, percentage -3% | `fire-vulnerable` |
+| `cold-resistant` | Cold Resistant | elements | positive | `coldDamageTaken`, percentage -3% | `cold-vulnerable` |
+| `quick-recovery` | Quick Recovery | recovery | positive | `hpRegeneration`, percentage +2% | `slow-recovery` |
+| `efficient` | Efficient | action-points | positive | `apCost`, percentage -2% | `wasteful` |
+| `treasure-hunter` | Treasure Hunter | loot | positive | `rareLootChance`, percentage +1% | `unlucky-finder` |
+| `night-owl` | Night Owl | time | positive | `nightMovementSpeed`, percentage +3% | `sleepyhead` |
+| `focused` | Focused | accuracy | positive | `skillAccuracy`, percentage +2% | `distracted` |
+| `weak` | Weak | offense | negative | `meleeDamage`, percentage -2% | `strong` |
+| `clumsy` | Clumsy | mobility | negative | `movementSpeed`, percentage -2% | `agile` |
+| `frail` | Frail | survivability | negative | `maxHp`, percentage -2% | `tough` |
+| `coward` | Coward | resistance | negative | `fearResistance`, percentage -5% | `brave` |
+| `slow-learner` | Slow Learner | progression | negative | `experienceGain`, percentage -2% | `fast-learner` |
+| `short-sighted` | Short Sighted | perception | negative | `visionRange`, percentage -3% | `keen-eyes` |
+| `beast-phobia` | Beast Phobia | creatures | negative | `beastDamageTaken`, percentage +5% | `animal-lover` |
+| `poor-hunter` | Poor Hunter | creatures | negative | `beastDamage`, percentage -5% | `beast-hunter` |
+| `fire-vulnerable` | Fire Vulnerable | elements | negative | `fireDamageTaken`, percentage +3% | `fire-resistant` |
+| `cold-vulnerable` | Cold Vulnerable | elements | negative | `coldDamageTaken`, percentage +3% | `cold-resistant` |
+| `slow-recovery` | Slow Recovery | recovery | negative | `hpRegeneration`, percentage -2% | `quick-recovery` |
+| `wasteful` | Wasteful | action-points | negative | `apCost`, percentage +2% | `efficient` |
+| `unlucky-finder` | Unlucky Finder | loot | negative | `rareLootChance`, percentage -1% | `treasure-hunter` |
+| `sleepyhead` | Sleepyhead | time | negative | `nightMovementSpeed`, percentage -3% | `night-owl` |
+| `distracted` | Distracted | accuracy | negative | `skillAccuracy`, percentage -2% | `focused` |
+
 ### การควบคุมและการต่อสู้
 
 - ผู้เล่นควบคุม Leader โดยตรง

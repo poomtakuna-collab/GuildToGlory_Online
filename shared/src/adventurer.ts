@@ -1,5 +1,7 @@
 import { generateStartingSkills, type StartingSkill } from "./skills.js";
 import { ADVENTURER_STAT_KEYS, type AdventurerStats } from "./stats.js";
+import { generateTraits } from "./traitGenerator.js";
+import { TRAIT_REGISTRY, type TraitDefinition } from "./traitRegistry.js";
 
 export { ADVENTURER_STAT_KEYS } from "./stats.js";
 export type { AdventurerStat, AdventurerStats } from "./stats.js";
@@ -32,6 +34,7 @@ export interface GeneratedAdventurer {
   baseStats: AdventurerStats;
   totalBaseStats: number;
   startingSkills: StartingSkill[];
+  traits: TraitDefinition[];
 }
 
 type RandomSource = () => number;
@@ -78,7 +81,8 @@ function generateBaseStats(total: number, random: RandomSource): AdventurerStats
 
 export function generateAdventurer(
   random: RandomSource = Math.random,
-  rarityConfigurations: readonly RarityConfiguration[] = RARITY_CONFIG
+  rarityConfigurations: readonly RarityConfiguration[] = RARITY_CONFIG,
+  traitRandom: RandomSource = Math.random
 ): GeneratedAdventurer {
   const rarity = chooseRarity(rarityConfigurations, random);
   const firstName = FIRST_NAMES[randomIndex(FIRST_NAMES.length, random)]!;
@@ -94,6 +98,7 @@ export function generateAdventurer(
     rarity,
     baseStats,
     totalBaseStats,
-    startingSkills: generateStartingSkills(rarity.name, baseStats, random)
+    startingSkills: generateStartingSkills(rarity.name, baseStats, random),
+    traits: generateTraits(TRAIT_REGISTRY, traitRandom)
   };
 }

@@ -378,6 +378,74 @@ h1 span {
   font-size: 9px;
 }
 
+.adventurer-traits {
+  margin-top: 18px;
+  padding-top: 14px;
+  border-top: 1px solid var(--line);
+}
+
+.adventurer-traits h3 {
+  margin: 0 0 10px;
+  font-family: "Marcellus", Georgia, serif;
+  font-size: 17px;
+  font-weight: 400;
+}
+
+.trait-list {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 6px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.trait-item {
+  display: flex;
+  min-width: 0;
+  flex-direction: column;
+  gap: 4px;
+  padding: 8px 9px;
+  border: 1px solid var(--line);
+  border-left-width: 2px;
+  background: rgb(12 20 18 / 34%);
+}
+
+.trait-positive {
+  border-left-color: #83c78c;
+}
+
+.trait-negative {
+  border-left-color: #e78273;
+}
+
+.trait-name {
+  font-size: 11px;
+  font-weight: 600;
+}
+
+.trait-positive .trait-name {
+  color: #83c78c;
+}
+
+.trait-negative .trait-name {
+  color: #e78273;
+}
+
+.trait-effects,
+.trait-empty {
+  color: var(--muted);
+  font-size: 10px;
+  line-height: 1.4;
+  overflow-wrap: anywhere;
+}
+
+.trait-empty {
+  grid-column: 1 / -1;
+  padding: 8px 0;
+  list-style: none;
+}
+
 .connection {
   display: flex;
   align-items: flex-start;
@@ -556,6 +624,14 @@ h1 span {
 
   .skill-name {
     font-size: 10px;
+  }
+
+  .trait-list {
+    gap: 5px;
+  }
+
+  .trait-item {
+    padding: 7px 6px;
   }
 
   .bottom-bar {
