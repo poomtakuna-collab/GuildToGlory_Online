@@ -1,0 +1,50 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="theme-color" content="#101a18" />
+    <title>GuildToGlory Online</title>
+  </head>
+  <body>
+    <main class="game-shell">
+      <div id="pixi-root" class="world" aria-hidden="true"></div>
+      <div class="world-shade" aria-hidden="true"></div>
+
+      <header class="topbar">
+        <a class="wordmark" href="/" aria-label="GuildToGlory Online home">
+          <span class="sigil" aria-hidden="true">G</span>
+          <span>GUILD<span class="wordmark-light">TOGLORY</span></span>
+        </a>
+        <span class="edition">ONLINE WORLDS <i></i> FOUNDATION</span>
+      </header>
+
+      <section class="start-panel" aria-labelledby="game-title">
+        <p class="eyebrow">A world forged together</p>
+        <h1 id="game-title">GuildToGlory <span>Online</span></h1>
+        <p class="intro">Your next chapter begins at the guild hall.</p>
+
+        <div class="connection" aria-live="polite" aria-atomic="true">
+          <span id="status-indicator" class="status-indicator" data-status="disconnected"></span>
+          <div>
+            <p id="connection-status" class="connection-title">Disconnected</p>
+            <p id="connection-detail" class="connection-detail">Waiting to reach the game server</p>
+          </div>
+        </div>
+
+        <button id="connect-button" class="connect-button" type="button">
+          <span class="button-mark" aria-hidden="true">+</span>
+          <span id="connect-label">Connect to server</span>
+        </button>
+        <p class="server-address">GAME SERVER <span id="server-address"></span></p>
+      </section>
+
+      <footer class="bottom-bar">
+        <span>GUILD TO GLORY</span>
+        <span id="round-trip-time">NETWORK STANDBY</span>
+        <span>CLIENT FOUNDATION 0.1</span>
+      </footer>
+    </main>
+    <script type="module" src="/src/main.ts"></script>
+  </body>
+</html>

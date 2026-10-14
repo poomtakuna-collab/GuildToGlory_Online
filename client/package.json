@@ -1,0 +1,19 @@
+{
+  "name": "@guild-to-glory/client",
+  "private": true,
+  "version": "0.1.0",
+  "type": "module",
+  "scripts": {
+    "dev": "vite --host 0.0.0.0",
+    "build": "vite build",
+    "typecheck": "tsc --noEmit"
+  },
+  "dependencies": {
+    "@guild-to-glory/shared": "*",
+    "colyseus.js": "^0.16.0",
+    "pixi.js": "^8.0.0"
+  },
+  "devDependencies": {
+    "vite": "^7.0.0"
+  }
+}
