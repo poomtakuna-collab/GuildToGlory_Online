@@ -4,3 +4,5 @@ export * from "./adventurer.js";
 export * from "./skills.js";
 export * from "./traitRegistry.js";
 export * from "./traitGenerator.js";
+export * from "./tileImages.js";
+export * from "./worldMaps.js";

@@ -1,19 +1,37 @@
 import { Client, type Room } from "colyseus.js";
-import { Application, Container, Graphics, Rectangle, Text } from "pixi.js";
+import { Application, Container, Graphics, Rectangle, Text, Sprite, type Texture } from "pixi.js";
+import { importPngFile, prepareTileTextures } from "./tileImages.js";
+import { MapEditorView, type EditorTool, type EditorMode } from "./mapEditor.js";
 import {
   ADVENTURER_STAT_KEYS,
-  GRID_OBSTACLES,
-  GRID_SIZE,
+  MAX_TILE_IMAGES,
+  type TileImageAsset,
+  cloneMapData,
   ISO_TILE_HEIGHT,
   ISO_TILE_WIDTH,
+  createMapData,
+  resizeMapData,
+  parseMapImport,
+  getTextureColor,
+  isTileWalkable,
   NETWORK_MESSAGES,
   RARITY_CONFIG,
   ROOM_NAME,
+  WORLD_MAP,
   generateAdventurer,
+  getMapPixelSize,
+  getMapTile,
+  gridToIsometric,
+  isometricToGrid,
   isWorldStateMessage,
+  isWorldMapMessage,
+  type WorldMapMessage,
   type AdventurerStat,
   type GeneratedAdventurer,
   type GridPoint,
+  type MapData,
+  type MapTextureId,
+  type NewMapPreset,
   type PingMessage,
   type PongMessage,
   type TraitDefinition,
@@ -23,7 +41,7 @@ import {
 import "./style.css";
 
 type ConnectionStatus = "connecting" | "connected" | "disconnected" | "error";
-type SectionName = "menu" | "world" | "adventurers";
+type SectionName = "menu" | "world" | "editor" | "adventurers";
 
 const serverUrl = import.meta.env.VITE_SERVER_URL || "ws://localhost:2567";
 const connectButton = document.querySelector<HTMLButtonElement>("#connect-button")!;
@@ -38,11 +56,43 @@ const worldRoot = document.querySelector<HTMLDivElement>("#pixi-root")!;
 const sections: Record<SectionName, HTMLElement> = {
   menu: document.querySelector<HTMLElement>("#menu-section")!,
   world: document.querySelector<HTMLElement>("#world-section")!,
+  editor: document.querySelector<HTMLElement>("#editor-section")!,
   adventurers: document.querySelector<HTMLElement>("#adventurers-section")!
 };
 const navigationButtons = document.querySelectorAll<HTMLButtonElement>("[data-section]");
 const worldInfo = document.querySelector<HTMLDivElement>("#world-info")!;
 const playerCount = document.querySelector<HTMLSpanElement>("#player-count")!;
+const editorRoot = document.querySelector<HTMLDivElement>("#map-editor-root")!;
+const editorStatus = document.querySelector<HTMLParagraphElement>("#editor-status")!;
+const editorTestStatus = document.querySelector<HTMLParagraphElement>("#editor-test-status")!;
+const editorTilePosition = document.querySelector<HTMLElement>("#editor-tile-position")!;
+const editorTileType = document.querySelector<HTMLElement>("#editor-tile-type")!;
+const editorTileWalkable = document.querySelector<HTMLElement>("#editor-tile-walkable")!;
+const editorToolButtons = document.querySelectorAll<HTMLButtonElement>("[data-editor-tool]");
+const editorModeButtons = document.querySelectorAll<HTMLButtonElement>("[data-editor-mode]");
+const textureTools = document.querySelector<HTMLElement>("#texture-tools")!;
+const gridTools = document.querySelector<HTMLElement>("#grid-tools")!;
+const gridGuideControl = document.querySelector<HTMLElement>("#grid-guide-control")!;
+const gridGuideToggle = document.querySelector<HTMLInputElement>("#grid-guide-toggle")!;
+const imageAssetPanel = document.querySelector<HTMLElement>("#image-asset-panel")!;
+const importPngButton = document.querySelector<HTMLButtonElement>("#import-png-button")!;
+const importPngInput = document.querySelector<HTMLInputElement>("#import-png-input")!;
+const assetPalette = document.querySelector<HTMLElement>("#asset-palette")!;
+let editorAssets: TileImageAsset[] = [];
+const editorModeHint = document.querySelector<HTMLElement>("#editor-mode-hint")!;
+const newMapPreset = document.querySelector<HTMLSelectElement>("#new-map-preset")!;
+let editorMode: EditorMode = "texture";
+const importMapButton = document.querySelector<HTMLButtonElement>("#import-map-button")!;
+const importMapInput = document.querySelector<HTMLInputElement>("#import-map-input")!;
+const exportMapButton = document.querySelector<HTMLButtonElement>("#export-map-button")!;
+const playTestButton = document.querySelector<HTMLButtonElement>("#playtest-button")!;
+const stopTestButton = document.querySelector<HTMLButtonElement>("#stoptest-button")!;
+const mapWidthInput = document.querySelector<HTMLInputElement>("#map-width")!;
+const mapHeightInput = document.querySelector<HTMLInputElement>("#map-height")!;
+const newMapButton = document.querySelector<HTMLButtonElement>("#new-map-button")!;
+const resizeMapButton = document.querySelector<HTMLButtonElement>("#resize-map-button")!;
+const mapSizeLabel = document.querySelector<HTMLElement>("#map-size")!;
+let mapImportPending = false;
 const generateButton = document.querySelector<HTMLButtonElement>("#generate-button")!;
 const adventurerName = document.querySelector<HTMLHeadingElement>("#adventurer-name")!;
 const adventurerRarity = document.querySelector<HTMLSpanElement>("#adventurer-rarity")!;
@@ -61,6 +111,9 @@ const statValues: Record<AdventurerStat, HTMLElement> = {
 const client = new Client(serverUrl);
 let activeRoom: Room | undefined;
 let worldViewPromise: Promise<WorldView> | undefined;
+let mapEditorViewPromise: Promise<MapEditorView> | undefined;
+const editorMapData: MapData = cloneMapData(WORLD_MAP);
+let editorPlayTestActive = false;
 let currentSection: SectionName = "menu";
 let connectionAttempt = 0;
 let status: ConnectionStatus = "disconnected";
@@ -131,18 +184,7 @@ interface PlayerVisual {
   targetY: number;
 }
 
-const MAP_WIDTH = GRID_SIZE * ISO_TILE_WIDTH;
-const MAP_HEIGHT = GRID_SIZE * ISO_TILE_HEIGHT + 32;
 const MAP_ORIGIN_Y = 24;
-const BLOCK_DEPTH = 12;
-const BLOCKED_TILES = new Set(GRID_OBSTACLES.map(({ column, row }) => `${column},${row}`));
-
-function projectGridPoint(point: Pick<GridPoint, "column" | "row">): { x: number; y: number } {
-  return {
-    x: MAP_WIDTH / 2 + (point.column - point.row) * ISO_TILE_WIDTH / 2,
-    y: MAP_ORIGIN_Y + (point.column + point.row) * ISO_TILE_HEIGHT / 2
-  };
-}
 
 function drawDiamond(graphics: Graphics, x: number, y: number, fill: number, alpha = 1): void {
   graphics.moveTo(x, y - ISO_TILE_HEIGHT / 2)
@@ -156,6 +198,10 @@ function drawDiamond(graphics: Graphics, x: number, y: number, fill: number, alp
 
 class WorldView {
   private readonly app: Application;
+  private map = createMapData(1,1,"empty-blocked");
+  private ready = false;
+  private textures = new Map<string,Texture>();
+  private readonly images = new Container();
   private readonly scene = new Container();
   private readonly players = new Map<string, PlayerVisual>();
   private readonly mapLayer = new Graphics();
@@ -163,13 +209,14 @@ class WorldView {
 
   constructor(app: Application, private readonly onDestination: (destination: GridPoint) => void) {
     this.app = app;
-    this.drawMap();
+
     this.mapLayer.zIndex = -2;
     this.selection.zIndex = -1;
-    this.scene.addChild(this.mapLayer, this.selection);
+    this.images.zIndex = -1.8;
+    this.scene.addChild(this.mapLayer, this.images, this.selection);
     this.scene.sortableChildren = true;
     this.scene.eventMode = "static";
-    this.scene.hitArea = new Rectangle(0, 0, MAP_WIDTH, MAP_HEIGHT);
+
     this.scene.on("pointerdown", (event) => this.selectTile(event.global.x, event.global.y));
     app.stage.addChild(this.scene);
     this.layout();
@@ -177,7 +224,29 @@ class WorldView {
     app.ticker.add(() => this.interpolatePlayers());
   }
 
+  clearMap(): void {
+    this.setWorldState({players:[]});
+    this.ready = false;
+    this.mapLayer.clear(); this.selection.clear();
+    for (const child of this.images.removeChildren()) child.destroy();
+    for (const texture of this.textures.values()) texture.destroy(true);
+    this.textures.clear();
+  }
+
+  setMapData(map: MapData, textures: Map<string,Texture>): void {
+    this.clearMap();
+    this.map = map; this.textures = textures; this.ready = true;
+    const size = getMapPixelSize(map);
+    this.scene.hitArea = new Rectangle((map.width-map.height)*ISO_TILE_WIDTH/2,0,size.width,size.height);
+    this.drawMap(); this.layout();
+  }
+
+  private project(point: GridPoint): {x:number;y:number} {
+    return gridToIsometric(point,this.map.width,MAP_ORIGIN_Y);
+  }
+
   setWorldState(state: WorldStateMessage, localPlayerId?: string): void {
+    if (!this.ready && state.players.length) return;
     const seenPlayers = new Set<string>();
 
     for (const player of state.players) {
@@ -189,7 +258,7 @@ class WorldView {
         this.scene.addChild(visual.container);
       }
 
-      const position = projectGridPoint({ column: player.x, row: player.y });
+      const position = this.project({ column: player.x, row: player.y });
       visual.targetX = position.x;
       visual.targetY = position.y;
       visual.container.zIndex = Math.round(player.x + player.y);
@@ -205,9 +274,9 @@ class WorldView {
   }
 
   private drawMap(): void {
-    for (let depth = 0; depth < GRID_SIZE * 2 - 1; depth += 1) {
-      const firstColumn = Math.max(0, depth - GRID_SIZE + 1);
-      const lastColumn = Math.min(GRID_SIZE - 1, depth);
+    for (let depth = 0; depth < this.map.width + this.map.height - 1; depth += 1) {
+      const firstColumn = Math.max(0, depth - this.map.height + 1);
+      const lastColumn = Math.min(this.map.width - 1, depth);
       for (let column = firstColumn; column <= lastColumn; column += 1) {
         this.drawTile(column, depth - column);
       }
@@ -215,37 +284,16 @@ class WorldView {
   }
 
   private drawTile(column: number, row: number): void {
-    const { x, y } = projectGridPoint({ column, row });
-    const blocked = BLOCKED_TILES.has(`${column},${row}`);
-    const top = { x, y: y - ISO_TILE_HEIGHT / 2 };
-    const right = { x: x + ISO_TILE_WIDTH / 2, y };
-    const bottom = { x, y: y + ISO_TILE_HEIGHT / 2 };
-    const left = { x: x - ISO_TILE_WIDTH / 2, y };
-
-    this.mapLayer.moveTo(left.x, left.y)
-      .lineTo(bottom.x, bottom.y)
-      .lineTo(bottom.x, bottom.y + BLOCK_DEPTH)
-      .lineTo(left.x, left.y + BLOCK_DEPTH)
-      .closePath()
-      .fill({ color: blocked ? "#554a3d" : "#294b3b" })
-      .stroke({ color: "#172d25", alpha: 0.8, width: 1 });
-    this.mapLayer.moveTo(right.x, right.y)
-      .lineTo(bottom.x, bottom.y)
-      .lineTo(bottom.x, bottom.y + BLOCK_DEPTH)
-      .lineTo(right.x, right.y + BLOCK_DEPTH)
-      .closePath()
-      .fill({ color: blocked ? "#6a5945" : "#315743" })
-      .stroke({ color: "#172d25", alpha: 0.8, width: 1 });
-    const tileColor = blocked ? 0x8a7255 : (column + row) % 2 === 0 ? 0x47795d : 0x3e7054;
-    drawDiamond(this.mapLayer, x, y, tileColor);
-    if (column === 0 || row === 0 || column === GRID_SIZE - 1 || row === GRID_SIZE - 1) {
-      this.mapLayer.moveTo(top.x, top.y)
-        .lineTo(right.x, right.y)
-        .lineTo(bottom.x, bottom.y)
-        .lineTo(left.x, left.y)
-        .closePath()
-        .stroke({ color: "#d9bb76", alpha: 0.6, width: 1.5 });
-    }
+    const tileData = getMapTile(this.map, { column, row })!;
+    const { x, y } = this.project({ column, row });
+    if (tileData.textureId === null) return;
+    const texture = this.textures.get(tileData.textureId);
+    if (texture) {
+      const sprite = new Sprite(texture);
+      sprite.anchor.set(0.5); sprite.position.set(x,y);
+      sprite.width = ISO_TILE_WIDTH; sprite.height = ISO_TILE_HEIGHT;
+      this.images.addChild(sprite);
+    } else drawDiamond(this.mapLayer,x,y,getTextureColor(tileData.textureId));
   }
 
   private createPlayer(player: WorldPlayer): PlayerVisual {
@@ -258,38 +306,34 @@ class WorldView {
       text: player.name,
       style: { fill: "#f2eddc", fontFamily: "DM Sans, sans-serif", fontSize: 11, fontWeight: "600" }
     });
-    name.anchor.set(0.5, 0);
-    name.position.set(0, 8);
+    name.anchor.set(0.5, 1);
+    name.position.set(0, -19);
     container.addChild(character, name);
-    const position = projectGridPoint({ column: player.x, row: player.y });
+    const position = this.project({ column: player.x, row: player.y });
     container.position.set(position.x, position.y);
     return { container, targetX: position.x, targetY: position.y };
   }
 
   private selectTile(screenX: number, screenY: number): void {
+    if (!this.ready) return;
     const local = this.scene.toLocal({ x: screenX, y: screenY });
-    const deltaX = local.x - MAP_WIDTH / 2;
-    const deltaY = local.y - MAP_ORIGIN_Y;
-    const destination = {
-      column: Math.round(deltaX / ISO_TILE_WIDTH + deltaY / ISO_TILE_HEIGHT),
-      row: Math.round(deltaY / ISO_TILE_HEIGHT - deltaX / ISO_TILE_WIDTH)
-    };
-    if (destination.column < 0 || destination.column >= GRID_SIZE || destination.row < 0 || destination.row >= GRID_SIZE) return;
-    if (BLOCKED_TILES.has(`${destination.column},${destination.row}`)) return;
+    const destination = isometricToGrid(local.x, local.y, this.map.width, MAP_ORIGIN_Y);
+    const tile = getMapTile(this.map, destination);
+    if (!isTileWalkable(tile)) return;
 
     this.selection.clear();
-    const { x, y } = projectGridPoint(destination);
+    const { x, y } = this.project(destination);
     drawDiamond(this.selection, x, y, 0xf0cc73, 0.42);
     this.onDestination(destination);
   }
 
   private layout(): void {
-    const scale = Math.min(this.app.screen.width / MAP_WIDTH, this.app.screen.height / MAP_HEIGHT);
+    if (!this.ready) return;
+    const size = getMapPixelSize(this.map);
+    const scale = Math.min(this.app.screen.width/size.width,this.app.screen.height/size.height);
+    const center = this.project({column:(this.map.width-1)/2,row:(this.map.height-1)/2});
     this.scene.scale.set(scale);
-    this.scene.position.set(
-      (this.app.screen.width - MAP_WIDTH * scale) / 2,
-      (this.app.screen.height - MAP_HEIGHT * scale) / 2
-    );
+    this.scene.position.set(this.app.screen.width/2-center.x*scale,this.app.screen.height/2-center.y*scale);
   }
 
   private interpolatePlayers(): void {
@@ -316,7 +360,7 @@ function setStatus(nextStatus: ConnectionStatus, detail: string): void {
 }
 
 function resetWorld(view: WorldView): void {
-  view.setWorldState({ players: [] });
+  view.clearMap();
   playerCount.textContent = "0 players";
   worldInfo.hidden = true;
 }
@@ -324,6 +368,221 @@ function resetWorld(view: WorldView): void {
 async function ensureWorldView(): Promise<WorldView> {
   if (!worldViewPromise) worldViewPromise = createWorldView();
   return worldViewPromise;
+}
+
+async function ensureMapEditorView(): Promise<MapEditorView> {
+  if (!mapEditorViewPromise) {
+    mapEditorViewPromise = MapEditorView.create(editorRoot, editorMapData, (point, type, walkable) => {
+      editorTilePosition.textContent = `${point.column}, ${point.row}`;
+      editorTileType.textContent = type === null ? "Empty" : editorAssets.find(asset => asset.id === type)?.name ?? type[0]!.toUpperCase() + type.slice(1);
+      editorTileWalkable.textContent = walkable ? "Walkable" : "Blocked";
+    }, (message) => {
+      editorStatus.textContent = message;
+    });
+  }
+  return mapEditorViewPromise;
+}
+
+function updateEditorTestControls(isPlaying: boolean): void {
+  editorPlayTestActive = isPlaying;
+  editorToolButtons.forEach((button) => { button.disabled = isPlaying || mapImportPending; });
+  editorModeButtons.forEach((button) => { button.disabled = isPlaying || mapImportPending; });
+  newMapPreset.disabled = isPlaying || mapImportPending;
+  imageAssetPanel.hidden = editorMode !== "texture";
+  importPngButton.disabled = isPlaying || mapImportPending;
+  exportMapButton.disabled = mapImportPending;
+  assetPalette.querySelectorAll<HTMLButtonElement>("button").forEach(button => { button.disabled = isPlaying || mapImportPending; });
+  gridGuideControl.hidden = editorMode !== "texture" || isPlaying;
+  gridGuideToggle.disabled = isPlaying || mapImportPending;
+  editorModeHint.textContent = isPlaying ? "Play Test displays textures; navigation controls movement." :
+    editorMode === "texture" ? "Texture only. Empty does not change walkability." : "Green: Walkable. Black: Blocked. Textures stay unchanged.";
+  importMapButton.disabled = isPlaying || mapImportPending;
+  newMapButton.disabled = isPlaying || mapImportPending;
+  resizeMapButton.disabled = isPlaying || mapImportPending;
+  mapWidthInput.disabled = isPlaying || mapImportPending;
+  mapHeightInput.disabled = isPlaying || mapImportPending;
+  playTestButton.disabled = mapImportPending;
+  playTestButton.hidden = isPlaying;
+  stopTestButton.hidden = !isPlaying;
+  stopTestButton.disabled = !isPlaying;
+  editorTestStatus.textContent = isPlaying ? "Local Play Test is running. Map editing is locked." : "Local Play Test is stopped";
+}
+
+async function startEditorPlayTest(): Promise<void> {
+  if (mapImportPending) return;
+  const editor = await ensureMapEditorView();
+  if (editor.startPlayTest()) updateEditorTestControls(true);
+}
+
+async function stopEditorPlayTest(): Promise<void> {
+  if (mapEditorViewPromise) (await mapEditorViewPromise).stopPlayTest();
+  updateEditorTestControls(false);
+}
+
+async function exportEditorMap(): Promise<void> {
+  const editor = await ensureMapEditorView();
+  const map = editor.getMapData();
+  const json = JSON.stringify(map);
+  const url = URL.createObjectURL(new Blob([json], { type: "application/json" }));
+  const anchor = document.createElement("a");
+  anchor.href = url;
+  anchor.download = `guild-to-glory-map-${map.width}x${map.height}.json`;
+  anchor.click();
+  window.setTimeout(() => URL.revokeObjectURL(url), 0);
+  editorStatus.textContent = `Exported ${map.width} x ${map.height} JSON map`;
+}
+
+function refreshMapDetails(map: MapData): void {
+  resetEditorToolSelection();
+  renderAssetPalette(map.assets ?? []);
+  mapWidthInput.value = String(map.width);
+  mapHeightInput.value = String(map.height);
+  mapSizeLabel.textContent = map.width + " x " + map.height;
+  editorTilePosition.textContent = "None";
+  editorTileType.textContent = "None";
+  editorTileWalkable.textContent = "None";
+}
+
+async function changeEditorDimensions(resize: boolean): Promise<void> {
+  if (editorPlayTestActive || mapImportPending) return;
+  try {
+    const width = Number(mapWidthInput.value);
+    const height = Number(mapHeightInput.value);
+    if (!Number.isInteger(width) || !Number.isInteger(height) || width < 1 || height < 1 || width > 500 || height > 500) {
+      throw new Error("Width and Height must be whole numbers from 1 to 500");
+    }
+    const editor = await ensureMapEditorView();
+    const current = editor.getMapData();
+    if (resize && width === current.width && height === current.height) return;
+    const warning = resize
+      ? "Resize to " + width + " x " + height + "? Tiles outside the new bounds will be permanently discarded."
+      : "Create a new map? This replaces both layers and clears imported PNG assets. Export JSON first to keep a copy.";
+    if ((!resize || width < current.width || height < current.height) && !window.confirm(warning)) return;
+    const map = resize ? resizeMapData(current, width, height) : createMapData(width, height, newMapPreset.value as NewMapPreset);
+    editor.setMapData(map);
+    refreshMapDetails(map);
+    editorStatus.textContent = (resize ? "Resized to " : "Created ") + width + " x " + height +
+      (resize ? ". New cells are Empty / Blocked; out-of-bounds cells were discarded." : ". " + newMapPreset.selectedOptions[0]!.textContent);
+  } catch (error) {
+    editorStatus.textContent = error instanceof Error ? error.message : "Unable to change map size";
+  }
+}
+
+async function importEditorMap(file: File): Promise<void> {
+  if (editorPlayTestActive || mapImportPending) return;
+  // Enough for 250,000 tiles including maximum-length optional texture keys.
+  if (file.size > 400_000_000) {
+    editorStatus.textContent = "Import failed: JSON file exceeds 400 MB";
+    return;
+  }
+  mapImportPending = true;
+  updateEditorTestControls(false);
+  try {
+    const { map: parsed, warnings } = parseMapImport(JSON.parse(await file.text()));
+    const notice = [...warnings, "Import replaces both layers of the current map. Export first to keep your edits. Continue?"].join("\n\n");
+    if (!window.confirm(notice)) {
+      editorStatus.textContent = "Import cancelled. Current map preserved.";
+      return;
+    }
+    const editor = await ensureMapEditorView();
+    const textures = await prepareTileTextures(parsed.assets ?? []);
+    editor.setMapData(parsed, textures);
+    refreshMapDetails(parsed);
+    editorStatus.textContent = "Imported " + parsed.width + " x " + parsed.height + " JSON map";
+  } catch (error) {
+    editorStatus.textContent = "Import failed: " + (error instanceof Error ? error.message : "Invalid JSON map");
+  } finally {
+    mapImportPending = false;
+    updateEditorTestControls(false);
+  }
+}
+
+function resetEditorToolSelection(): void {
+  clearAssetSelection();
+  editorToolButtons.forEach(button => {
+    const selected = button.dataset.editorTool === "select";
+    button.classList.toggle("is-selected", selected);
+    button.setAttribute("aria-pressed", String(selected));
+  });
+}
+
+function clearAssetSelection(): void {
+  assetPalette.querySelectorAll("button").forEach(button => {
+    button.classList.remove("is-selected"); button.setAttribute("aria-pressed", "false");
+  });
+}
+
+function renderAssetPalette(assets: TileImageAsset[]): void {
+  editorAssets = assets;
+  assetPalette.replaceChildren();
+  if (!assets.length) {
+    assetPalette.textContent = "No imported images";
+    return;
+  }
+  for (const asset of assets) {
+    const button = document.createElement("button");
+    button.type = "button"; button.className = "asset-tile";
+    button.title = asset.name; button.setAttribute("aria-label", "Paint " + asset.name);
+    button.setAttribute("aria-pressed", "false");
+    const preview = document.createElement("img"); preview.src = asset.dataUrl; preview.alt = "";
+    const label = document.createElement("span"); label.textContent = asset.name;
+    button.append(preview, label);
+    button.addEventListener("click", async () => {
+      if (editorPlayTestActive || mapImportPending || editorMode !== "texture") return;
+      (await ensureMapEditorView()).setTool("paint", asset.id);
+      clearAssetSelection();
+      editorToolButtons.forEach(tool => { tool.classList.remove("is-selected"); tool.setAttribute("aria-pressed", "false"); });
+      button.classList.add("is-selected"); button.setAttribute("aria-pressed", "true");
+      editorStatus.textContent = "Paint " + asset.name;
+    });
+    const remove = document.createElement("button");
+    remove.type = "button"; remove.className = "asset-delete";
+    remove.textContent = "Delete"; remove.setAttribute("aria-label", "Delete " + asset.name);
+    remove.addEventListener("click", async () => {
+      if (editorPlayTestActive || mapImportPending) return;
+      const editor = await ensureMapEditorView();
+      if (editorPlayTestActive || mapImportPending) return;
+      const count = editor.getMapData().tiles.filter(tile => tile.textureId === asset.id).length;
+      if (!window.confirm('Delete "' + asset.name + '"? ' + count +
+          " tile(s) will become Empty. Walkable / Blocked stays unchanged. Export first for a backup.")) return;
+      const cleared = editor.removeImageAsset(asset.id);
+      renderAssetPalette(editorAssets.filter(candidate => candidate.id !== asset.id));
+      resetEditorToolSelection();
+      editorTilePosition.textContent = "None";
+      editorTileType.textContent = "None";
+      editorTileWalkable.textContent = "None";
+      editorStatus.textContent = "Deleted " + asset.name + "; cleared " + cleared + " tile texture(s).";
+    });
+    const entry = document.createElement("div"); entry.className = "asset-entry";
+    entry.append(button, remove);
+    assetPalette.append(entry);
+  }
+}
+
+async function importEditorPngs(files: File[]): Promise<void> {
+  if (editorPlayTestActive || mapImportPending || !files.length) return;
+  if (editorAssets.length + files.length > MAX_TILE_IMAGES) {
+    editorStatus.textContent = "Import failed: maximum 64 PNG assets per map";
+    return;
+  }
+  mapImportPending = true;
+  updateEditorTestControls(false);
+  try {
+    const assets: TileImageAsset[] = [];
+    for (const file of files) assets.push(await importPngFile(file));
+    const editor = await ensureMapEditorView();
+    const textures = await prepareTileTextures(assets);
+    editor.addImageAssets(assets, textures);
+    editor.setTool("select");
+    resetEditorToolSelection();
+    renderAssetPalette([...editorAssets, ...assets]);
+    editorStatus.textContent = "Imported " + assets.length + " PNG image(s). Select an image to paint.";
+  } catch (error) {
+    editorStatus.textContent = "PNG import failed: " + (error instanceof Error ? error.message : "Invalid PNG");
+  } finally {
+    mapImportPending = false;
+    updateEditorTestControls(false);
+  }
 }
 
 async function leaveWorld(): Promise<void> {
@@ -343,6 +602,7 @@ async function leaveWorld(): Promise<void> {
 
 async function showSection(section: SectionName): Promise<void> {
   if (currentSection === "world" && section !== "world") await leaveWorld();
+  if (currentSection === "editor" && section !== "editor" && editorPlayTestActive) await stopEditorPlayTest();
   currentSection = section;
 
   for (const [name, element] of Object.entries(sections) as [SectionName, HTMLElement][]) {
@@ -357,8 +617,15 @@ async function showSection(section: SectionName): Promise<void> {
   if (section === "world") {
     try {
       await ensureWorldView();
+      if (currentSection === "world" && (status === "disconnected" || status === "error")) await connectToServer();
     } catch (error) {
       setStatus("error", error instanceof Error ? error.message : "Unable to initialize the world");
+    }
+  } else if (section === "editor") {
+    try {
+      await ensureMapEditorView();
+    } catch (error) {
+      editorStatus.textContent = error instanceof Error ? error.message : "Unable to initialize the Map Editor";
     }
   }
 }
@@ -388,12 +655,41 @@ async function connectToServer(): Promise<void> {
     }
     activeRoom = room;
     worldInfo.hidden = false;
-    setStatus("connected", `Room ${room.roomId} · checking server response`);
-
-    room.onMessage<WorldStateMessage>(NETWORK_MESSAGES.worldState, (message) => {
+    let mapReady = false;
+    let receivingMap = false;
+    let latestState: WorldStateMessage = {players:[]};
+    const failMap = async (error: unknown) => {
+      if (activeRoom !== room) return;
+      activeRoom = undefined;
+      clearTimeout(mapTimeout);
+      resetWorld(worldView);
+      setStatus("error", "World map load failed: " + (error instanceof Error ? error.message : String(error)));
+      await room.leave().catch(() => {});
+    };
+    const mapTimeout = window.setTimeout(() => { void failMap(new Error("Server map response timed out")); },15000);
+    room.onMessage<WorldMapMessage>(NETWORK_MESSAGES.worldMap, async message => {
+      if (activeRoom !== room || receivingMap) return;
+      receivingMap = true;
+      try {
+        if (!isWorldMapMessage(message)) throw new Error("Invalid authoritative map payload");
+        const textures = await prepareTileTextures(message.map.assets ?? []);
+        if (activeRoom !== room) {
+          for (const texture of textures.values()) texture.destroy(true);
+          return;
+        }
+        worldView.setMapData(message.map,textures);
+        mapReady = true;
+        clearTimeout(mapTimeout);
+        document.querySelector("#world-title")!.textContent = message.mapId + " - " + message.mapName;
+        worldView.setWorldState(latestState,room.sessionId);
+        setStatus("connected", "Map " + message.mapId + " / Room " + room.roomId);
+      } catch (error) { await failMap(error); }
+    });
+    room.onMessage<WorldStateMessage>(NETWORK_MESSAGES.worldState, message => {
       if (activeRoom !== room || !isWorldStateMessage(message)) return;
-      worldView.setWorldState(message, room.sessionId);
-      playerCount.textContent = `${message.players.length} ${message.players.length === 1 ? "player" : "players"}`;
+      latestState = message;
+      if (mapReady) worldView.setWorldState(message,room.sessionId);
+      playerCount.textContent = message.players.length + " players";
     });
 
     room.onMessage<PongMessage>(NETWORK_MESSAGES.pong, (message) => {
@@ -404,6 +700,7 @@ async function connectToServer(): Promise<void> {
     });
 
     room.onLeave((code) => {
+      clearTimeout(mapTimeout);
       if (activeRoom !== room) return;
       activeRoom = undefined;
       resetWorld(worldView);
@@ -435,6 +732,67 @@ navigationButtons.forEach((button) => {
     if (section && section in sections) void showSection(section);
   });
 });
+gridGuideToggle.addEventListener("change", () => {
+  void ensureMapEditorView().then(editor => editor.setGridGuideVisible(gridGuideToggle.checked));
+});
+editorModeButtons.forEach((button) => {
+  button.addEventListener("click", async () => {
+    if (editorPlayTestActive || mapImportPending) return;
+    clearAssetSelection();
+    editorMode = button.dataset.editorMode as EditorMode;
+    (await ensureMapEditorView()).setMode(editorMode);
+    textureTools.hidden = editorMode !== "texture";
+    gridTools.hidden = editorMode !== "grid";
+    editorModeButtons.forEach(candidate => {
+      const selected = candidate === button;
+      candidate.classList.toggle("is-selected", selected);
+      candidate.setAttribute("aria-pressed", String(selected));
+    });
+    editorToolButtons.forEach(candidate => {
+      const selected = candidate.dataset.editorTool === "select";
+      candidate.classList.toggle("is-selected", selected);
+      candidate.setAttribute("aria-pressed", String(selected));
+    });
+    updateEditorTestControls(false);
+    editorStatus.textContent = editorMode === "texture" ? "Texture Mode selected" : "Grid Mode selected";
+  });
+});
+editorToolButtons.forEach((button) => {
+  button.addEventListener("click", () => {
+    if (editorPlayTestActive || mapImportPending) return;
+    clearAssetSelection();
+    const tool = button.dataset.editorTool as EditorTool | undefined;
+    const tileType = button.dataset.tileType as MapTextureId | undefined;
+    if (!tool) return;
+    mapEditorViewPromise?.then((editor) => editor.setTool(tool, tileType));
+    editorToolButtons.forEach((candidate) => {
+      const selected = candidate === button;
+      candidate.classList.toggle("is-selected", selected);
+      candidate.setAttribute("aria-pressed", String(selected));
+    });
+    editorStatus.textContent = tool === "paint" ? `Paint ${tileType ?? "grass"}` : `${tool[0]!.toUpperCase()}${tool.slice(1)} tool selected`;
+  });
+});
+importPngButton.addEventListener("click", () => importPngInput.click());
+importPngInput.addEventListener("change", () => {
+  const files = Array.from(importPngInput.files ?? []);
+  importPngInput.value = "";
+  void importEditorPngs(files);
+});
+newMapButton.addEventListener("click", () => void changeEditorDimensions(false));
+resizeMapButton.addEventListener("click", () => void changeEditorDimensions(true));
+document.querySelector("#zoom-in")!.addEventListener("click", () => { void mapEditorViewPromise?.then(editor => editor.zoom(1.25)); });
+document.querySelector("#zoom-out")!.addEventListener("click", () => { void mapEditorViewPromise?.then(editor => editor.zoom(0.8)); });
+document.querySelector("#reset-camera")!.addEventListener("click", () => { void mapEditorViewPromise?.then(editor => editor.resetCamera()); });
+importMapButton.addEventListener("click", () => importMapInput.click());
+importMapInput.addEventListener("change", () => {
+  const file = importMapInput.files?.[0];
+  if (file) void importEditorMap(file);
+  importMapInput.value = "";
+});
+exportMapButton.addEventListener("click", () => void exportEditorMap());
+playTestButton.addEventListener("click", () => void startEditorPlayTest());
+stopTestButton.addEventListener("click", () => void stopEditorPlayTest());
 
 async function createWorldView(): Promise<WorldView> {
   const app = new Application();

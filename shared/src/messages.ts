@@ -1,4 +1,4 @@
-import type { GridPoint } from "./grid.js";
+import { isMapData, type MapData, type GridPoint } from "./grid.js";
 
 export const ROOM_NAME = "connection";
 
@@ -11,6 +11,7 @@ export const NETWORK_MESSAGES = {
   pong: "pong",
   destination: "world:destination",
   worldSync: "world:sync",
+  worldMap: "world:map",
   worldState: "world:state"
 } as const;
 
@@ -70,4 +71,11 @@ export function isWorldStateMessage(value: unknown): value is WorldStateMessage 
     "x" in player && typeof player.x === "number" && Number.isFinite(player.x) &&
     "y" in player && typeof player.y === "number" && Number.isFinite(player.y)
   ));
+}
+export interface WorldMapMessage { mapId: string; mapName: string; map: MapData }
+export function isWorldMapMessage(value: unknown): value is WorldMapMessage {
+  if (typeof value !== "object" || value === null) return false;
+  const message = value as WorldMapMessage;
+  return typeof message.mapId === "string" && message.mapId.length > 0 &&
+    typeof message.mapName === "string" && isMapData(message.map);
 }

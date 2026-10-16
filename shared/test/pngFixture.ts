@@ -1,0 +1,2 @@
+// Valid 64x32 RGBA PNG: transparent left half, semi-transparent red right half.
+export const PNG_DATA_URL = "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAEAAAAAgCAYAAACinX6EAAAAQ0lEQVR4nO3QMQEAAAjDsEnHObhgT44KaLJJyk2z9jwAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAADw0AHvf/iIwIJLQwAAAABJRU5ErkJggg==";

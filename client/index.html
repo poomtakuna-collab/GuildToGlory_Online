@@ -16,6 +16,7 @@
         <nav class="section-nav" aria-label="Main navigation">
           <button type="button" data-section="menu" aria-current="page">Main Menu</button>
           <button type="button" data-section="world">World</button>
+          <button type="button" data-section="editor">Map Editor</button>
           <button type="button" data-section="adventurers">Adventurers</button>
         </nav>
         <span class="edition">ONLINE WORLDS <i></i> FOUNDATION</span>
@@ -28,6 +29,7 @@
           <p class="intro">Your next chapter begins at the guild hall.</p>
           <div class="menu-actions">
             <button class="connect-button" type="button" data-section="world">Enter World</button>
+            <button class="secondary-button" type="button" data-section="editor">Map Editor</button>
             <button class="secondary-button" type="button" data-section="adventurers">Adventurers</button>
           </div>
           <p class="server-address">GAME SERVER <span id="server-address"></span></p>
@@ -64,6 +66,98 @@
             <span id="connect-label">Connect to server</span>
           </button>
           <span class="server-address">GAME SERVER <span id="server-address-world"></span></span>
+        </div>
+      </section>
+
+      <section id="editor-section" class="page-section editor-section" aria-labelledby="editor-title" hidden>
+        <div class="editor-workbench">
+          <aside class="editor-sidebar" aria-label="Map editor controls">
+        <div class="section-heading editor-heading">
+          <div>
+            <p class="eyebrow">Local workshop</p>
+            <h1 id="editor-title">Map Editor</h1>
+          </div>
+          <button class="secondary-button" type="button" data-section="menu">Main Menu</button>
+        </div>
+
+        <div class="editor-size-controls">
+          <label>Width <input id="map-width" type="number" min="1" max="500" step="1" value="20" /></label>
+          <label>Height <input id="map-height" type="number" min="1" max="500" step="1" value="20" /></label>
+          <label class="editor-preset">New map fill
+            <select id="new-map-preset">
+              <option value="empty-blocked">Empty / Blocked</option>
+              <option value="grass-walkable" selected>Grass / Walkable</option>
+            </select>
+          </label>
+          <button id="new-map-button" class="secondary-button" type="button">New Map</button>
+          <button id="resize-map-button" class="secondary-button" type="button">Resize Map</button>
+          <span>Current: <strong id="map-size">20 x 20</strong> / Max 500 x 500</span>
+          <p>Resize keeps the top-left area, fills new cells with Empty / Blocked, and discards cells outside the new bounds.</p>
+        </div>
+        <div class="editor-camera-controls">
+          <button id="zoom-out" class="secondary-button" type="button" aria-label="Zoom out">&minus;</button>
+          <button id="zoom-in" class="secondary-button" type="button" aria-label="Zoom in">+</button>
+          <button id="reset-camera" class="secondary-button" type="button">Center Map</button>
+          <span>Pan: right/middle or Shift + drag. Zoom: wheel (50-400%). Erase: texture only.</span>
+        </div>
+        <div class="editor-layer-modes" role="group" aria-label="Editor layer">
+          <button type="button" class="editor-tool-button is-selected" data-editor-mode="texture" aria-pressed="true">Texture Mode</button>
+          <button type="button" class="editor-tool-button" data-editor-mode="grid" aria-pressed="false">Grid Mode</button>
+        </div>
+        <label id="grid-guide-control" class="editor-grid-guide">
+          <input id="grid-guide-toggle" type="checkbox" checked /> Show grid guide
+          <span>Faint green: Walkable / black: Blocked</span>
+        </label>
+        <p id="editor-mode-hint" class="editor-mode-hint">Texture only. Empty does not change walkability.</p>
+        <div class="editor-toolbar" role="toolbar" aria-label="Map editing tools">
+          <div id="texture-tools" class="editor-tool-group" role="group" aria-label="Texture tools">
+            <button class="editor-tool-button is-selected" type="button" data-editor-tool="select" aria-pressed="true">Select</button>
+            <button class="editor-tool-button" type="button" data-editor-tool="paint" data-tile-type="grass" aria-pressed="false">
+              <span class="tile-swatch swatch-grass" aria-hidden="true"></span>Grass
+            </button>
+            <button class="editor-tool-button" type="button" data-editor-tool="paint" data-tile-type="dirt" aria-pressed="false">
+              <span class="tile-swatch swatch-dirt" aria-hidden="true"></span>Dirt
+            </button>
+            <button class="editor-tool-button" type="button" data-editor-tool="paint" data-tile-type="stone" aria-pressed="false">
+              <span class="tile-swatch swatch-stone" aria-hidden="true"></span>Stone
+            </button>
+
+            <button class="editor-tool-button" type="button" data-editor-tool="erase" aria-pressed="false">Empty / Erase</button>
+          </div>
+          <section id="image-asset-panel" aria-label="PNG ground textures">
+            <button id="import-png-button" class="secondary-button" type="button">Import PNG</button>
+            <input id="import-png-input" type="file" accept="image/png,.png" multiple hidden />
+            <p class="editor-mode-hint">Images fit 64 x 32 and clip to the tile diamond, keeping transparency. Up to 64 images; 4 MB / 2048 px per source. JSON includes images.</p>
+            <div id="asset-palette" class="asset-palette" aria-label="Asset Palette">No imported images</div>
+          </section>
+          <div id="grid-tools" class="editor-tool-group" role="group" aria-label="Navigation tools" hidden>
+            <button class="editor-tool-button is-selected" type="button" data-editor-tool="select" aria-pressed="true">Select</button>
+            <button class="editor-tool-button" type="button" data-editor-tool="walkable" aria-pressed="false"><span class="tile-swatch swatch-walkable" aria-hidden="true"></span>Walkable</button>
+            <button class="editor-tool-button" type="button" data-editor-tool="blocked" aria-pressed="false"><span class="tile-swatch swatch-blocked" aria-hidden="true"></span>Blocked</button>
+          </div>
+          <div class="editor-file-group" role="group" aria-label="Map files and test controls">
+            <button id="export-map-button" class="secondary-button" type="button">Export JSON</button>
+            <button id="import-map-button" class="secondary-button" type="button">Import JSON</button>
+            <input id="import-map-input" type="file" accept="application/json,.json" hidden />
+            <button id="playtest-button" class="generate-button" type="button">Play Test</button>
+            <button id="stoptest-button" class="secondary-button" type="button" hidden disabled>Stop Test</button>
+          </div>
+        </div>
+
+            <section class="editor-inspector" aria-label="Selected tile details">
+            <p class="editor-panel-title">Tile Inspector</p>
+            <dl class="editor-tile-details">
+              <div><dt>Position</dt><dd id="editor-tile-position">None</dd></div>
+              <div><dt>Texture</dt><dd id="editor-tile-type">&mdash;</dd></div>
+              <div><dt>Walkability</dt><dd id="editor-tile-walkable">&mdash;</dd></div>
+            </dl>
+            <p id="editor-status" class="editor-status" role="status" aria-live="polite">20 × 20 map ready</p>
+            <p id="editor-test-status" class="editor-test-status" aria-live="polite">Local Play Test is stopped</p>
+            </section>
+          </aside>
+          <div class="editor-map-stage">
+            <div id="map-editor-root" class="editor-map" aria-label="Isometric map editing canvas"></div>
+          </div>
         </div>
       </section>
 

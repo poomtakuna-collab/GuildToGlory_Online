@@ -1,8 +1,7 @@
+import { getWorldMaps } from "../worldMaps.js";
 import { Room, type Client } from "@colyseus/core";
 import {
   findGridPath,
-  GRID_OBSTACLES,
-  GRID_SIZE,
   NETWORK_MESSAGES,
   isPingMessage,
   isWorldDestinationMessage,
@@ -20,14 +19,14 @@ interface PlayerState extends WorldPlayer {
 const PLAYER_SPEED = 4.5;
 const TICK_RATE = 20;
 const PLAYER_COLORS = [0xe5bd69, 0x70b8a0, 0xd97d69, 0x8c9ddd, 0xd783b4, 0xa7bd67];
-const SPAWN_POINTS = Array.from({ length: GRID_SIZE * GRID_SIZE }, (_, index) => ({
-  column: index % GRID_SIZE,
-  row: Math.floor(index / GRID_SIZE)
-})).filter((point) => !GRID_OBSTACLES.some((obstacle) => obstacle.column === point.column && obstacle.row === point.row));
+
 
 export class ConnectionRoom extends Room {
   private readonly players = new Map<string, PlayerState>();
   private nextPlayerNumber = 0;
+  private readonly world = getWorldMaps();
+  private readonly mapId = this.world.registry.startingMapId;
+  private readonly map = this.world.maps.get(this.mapId)!;
 
   onCreate(): void {
     this.onMessage(NETWORK_MESSAGES.ping, (client: Client, payload: unknown) => {
@@ -45,14 +44,15 @@ export class ConnectionRoom extends Room {
       const player = this.players.get(client.sessionId);
       if (!player) return;
 
-      const start = { column: Math.round(player.x), row: Math.round(player.y) };
-      const path = findGridPath(start, payload);
+      const start = player.path[player.pathIndex] ?? { column: Math.round(player.x), row: Math.round(player.y) };
+      const path = findGridPath(start, payload, this.map);
       if (!path) return;
       player.path = path;
       player.pathIndex = 0;
     });
 
     this.onMessage(NETWORK_MESSAGES.worldSync, (client: Client) => {
+      client.send(NETWORK_MESSAGES.worldMap, { mapId: this.mapId, mapName: this.world.registry.maps.find(entry => entry.id === this.mapId)!.name, map: this.map });
       client.send(NETWORK_MESSAGES.worldState, this.createWorldState());
     });
 
@@ -61,7 +61,7 @@ export class ConnectionRoom extends Room {
 
   onJoin(client: Client): void {
     const playerNumber = ++this.nextPlayerNumber;
-    const spawn = SPAWN_POINTS[(playerNumber - 1) % SPAWN_POINTS.length]!;
+    const spawn = this.world.spawn;
     this.players.set(client.sessionId, {
       id: client.sessionId,
       name: `Adventurer ${playerNumber}`,

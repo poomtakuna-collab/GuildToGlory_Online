@@ -1,0 +1,1607 @@
+{
+  "schemaVersion": 2,
+  "width": 20,
+  "height": 20,
+  "tiles": [
+    {
+      "textureId": "grass",
+      "walkable": true
+    },
+    {
+      "textureId": "grass",
+      "walkable": true
+    },
+    {
+      "textureId": "grass",
+      "walkable": true
+    },
+    {
+      "textureId": "grass",
+      "walkable": true
+    },
+    {
+      "textureId": "grass",
+      "walkable": true
+    },
+    {
+      "textureId": "grass",
+      "walkable": true
+    },
+    {
+      "textureId": "grass",
+      "walkable": true
+    },
+    {
+      "textureId": "grass",
+      "walkable": true
+    },
+    {
+      "textureId": "grass",
+      "walkable": true
+    },
+    {
+      "textureId": "grass",
+      "walkable": true
+    },
+    {
+      "textureId": "grass",
+      "walkable": true
+    },
+    {
+      "textureId": "grass",
+      "walkable": true
+    },
+    {
+      "textureId": "grass",
+      "walkable": true
+    },
+    {
+      "textureId": "grass",
+      "walkable": true
+    },
+    {
+      "textureId": "grass",
+      "walkable": true
+    },
+    {
+      "textureId": "grass",
+      "walkable": true
+    },
+    {
+      "textureId": "grass",
+      "walkable": true
+    },
+    {
+      "textureId": "grass",
+      "walkable": true
+    },
+    {
+      "textureId": "grass",
+      "walkable": true
+    },
+    {
+      "textureId": "grass",
+      "walkable": true
+    },
+    {
+      "textureId": "grass",
+      "walkable": true
+    },
+    {
+      "textureId": "grass",
+      "walkable": true
+    },
+    {
+      "textureId": "grass",
+      "walkable": true
+    },
+    {
+      "textureId": "grass",
+      "walkable": true
+    },
+    {
+      "textureId": "grass",
+      "walkable": true
+    },
+    {
+      "textureId": "grass",
+      "walkable": true
+    },
+    {
+      "textureId": "grass",
+      "walkable": true
+    },
+    {
+      "textureId": "grass",
+      "walkable": true
+    },
+    {
+      "textureId": "grass",
+      "walkable": true
+    },
+    {
+      "textureId": "grass",
+      "walkable": true
+    },
+    {
+      "textureId": "grass",
+      "walkable": true
+    },
+    {
+      "textureId": "grass",
+      "walkable": true
+    },
+    {
+      "textureId": "grass",
+      "walkable": true
+    },
+    {
+      "textureId": "grass",
+      "walkable": true
+    },
+    {
+      "textureId": "grass",
+      "walkable": true
+    },
+    {
+      "textureId": "grass",
+      "walkable": true
+    },
+    {
+      "textureId": "grass",
+      "walkable": true
+    },
+    {
+      "textureId": "grass",
+      "walkable": true
+    },
+    {
+      "textureId": "grass",
+      "walkable": true
+    },
+    {
+      "textureId": "grass",
+      "walkable": true
+    },
+    {
+      "textureId": "grass",
+      "walkable": true
+    },
+    {
+      "textureId": "grass",
+      "walkable": true
+    },
+    {
+      "textureId": "grass",
+      "walkable": true
+    },
+    {
+      "textureId": "grass",
+      "walkable": true
+    },
+    {
+      "textureId": "grass",
+      "walkable": true
+    },
+    {
+      "textureId": "grass",
+      "walkable": true
+    },
+    {
+      "textureId": "grass",
+      "walkable": true
+    },
+    {
+      "textureId": "grass",
+      "walkable": true
+    },
+    {
+      "textureId": "grass",
+      "walkable": true
+    },
+    {
+      "textureId": "grass",
+      "walkable": true
+    },
+    {
+      "textureId": "grass",
+      "walkable": true
+    },
+    {
+      "textureId": "grass",
+      "walkable": true
+    },
+    {
+      "textureId": "grass",
+      "walkable": true
+    },
+    {
+      "textureId": "grass",
+      "walkable": true
+    },
+    {
+      "textureId": "grass",
+      "walkable": true
+    },
+    {
+      "textureId": "grass",
+      "walkable": true
+    },
+    {
+      "textureId": "grass",
+      "walkable": true
+    },
+    {
+      "textureId": "grass",
+      "walkable": true
+    },
+    {
+      "textureId": "grass",
+      "walkable": true
+    },
+    {
+      "textureId": "grass",
+      "walkable": true
+    },
+    {
+      "textureId": "grass",
+      "walkable": true
+    },
+    {
+      "textureId": "grass",
+      "walkable": true
+    },
+    {
+      "textureId": "grass",
+      "walkable": true
+    },
+    {
+      "textureId": "grass",
+      "walkable": true
+    },
+    {
+      "textureId": "grass",
+      "walkable": true
+    },
+    {
+      "textureId": "grass",
+      "walkable": true
+    },
+    {
+      "textureId": "grass",
+      "walkable": true
+    },
+    {
+      "textureId": "grass",
+      "walkable": true
+    },
+    {
+      "textureId": "grass",
+      "walkable": true
+    },
+    {
+      "textureId": "grass",
+      "walkable": true
+    },
+    {
+      "textureId": "grass",
+      "walkable": true
+    },
+    {
+      "textureId": "grass",
+      "walkable": true
+    },
+    {
+      "textureId": "grass",
+      "walkable": true
+    },
+    {
+      "textureId": "grass",
+      "walkable": true
+    },
+    {
+      "textureId": "grass",
+      "walkable": true
+    },
+    {
+      "textureId": "grass",
+      "walkable": true
+    },
+    {
+      "textureId": "grass",
+      "walkable": true
+    },
+    {
+      "textureId": "grass",
+      "walkable": true
+    },
+    {
+      "textureId": "grass",
+      "walkable": true
+    },
+    {
+      "textureId": "grass",
+      "walkable": true
+    },
+    {
+      "textureId": "grass",
+      "walkable": true
+    },
+    {
+      "textureId": "grass",
+      "walkable": true
+    },
+    {
+      "textureId": "grass",
+      "walkable": true
+    },
+    {
+      "textureId": "grass",
+      "walkable": true
+    },
+    {
+      "textureId": "grass",
+      "walkable": true
+    },
+    {
+      "textureId": "grass",
+      "walkable": true
+    },
+    {
+      "textureId": "grass",
+      "walkable": true
+    },
+    {
+      "textureId": "grass",
+      "walkable": true
+    },
+    {
+      "textureId": "grass",
+      "walkable": true
+    },
+    {
+      "textureId": "grass",
+      "walkable": true
+    },
+    {
+      "textureId": "grass",
+      "walkable": true
+    },
+    {
+      "textureId": "grass",
+      "walkable": true
+    },
+    {
+      "textureId": "grass",
+      "walkable": true
+    },
+    {
+      "textureId": "grass",
+      "walkable": true
+    },
+    {
+      "textureId": "grass",
+      "walkable": true
+    },
+    {
+      "textureId": "grass",
+      "walkable": true
+    },
+    {
+      "textureId": "grass",
+      "walkable": true
+    },
+    {
+      "textureId": "grass",
+      "walkable": true
+    },
+    {
+      "textureId": "grass",
+      "walkable": true
+    },
+    {
+      "textureId": "grass",
+      "walkable": true
+    },
+    {
+      "textureId": "grass",
+      "walkable": true
+    },
+    {
+      "textureId": "grass",
+      "walkable": true
+    },
+    {
+      "textureId": "grass",
+      "walkable": true
+    },
+    {
+      "textureId": "grass",
+      "walkable": true
+    },
+    {
+      "textureId": "grass",
+      "walkable": true
+    },
+    {
+      "textureId": "grass",
+      "walkable": true
+    },
+    {
+      "textureId": "grass",
+      "walkable": true
+    },
+    {
+      "textureId": "grass",
+      "walkable": true
+    },
+    {
+      "textureId": "grass",
+      "walkable": true
+    },
+    {
+      "textureId": "grass",
+      "walkable": true
+    },
+    {
+      "textureId": "grass",
+      "walkable": true
+    },
+    {
+      "textureId": "grass",
+      "walkable": true
+    },
+    {
+      "textureId": "grass",
+      "walkable": true
+    },
+    {
+      "textureId": "grass",
+      "walkable": true
+    },
+    {
+      "textureId": "grass",
+      "walkable": true
+    },
+    {
+      "textureId": "grass",
+      "walkable": true
+    },
+    {
+      "textureId": "grass",
+      "walkable": true
+    },
+    {
+      "textureId": "grass",
+      "walkable": true
+    },
+    {
+      "textureId": "grass",
+      "walkable": true
+    },
+    {
+      "textureId": "grass",
+      "walkable": true
+    },
+    {
+      "textureId": "grass",
+      "walkable": true
+    },
+    {
+      "textureId": "grass",
+      "walkable": true
+    },
+    {
+      "textureId": "grass",
+      "walkable": true
+    },
+    {
+      "textureId": "grass",
+      "walkable": true
+    },
+    {
+      "textureId": "grass",
+      "walkable": true
+    },
+    {
+      "textureId": "grass",
+      "walkable": true
+    },
+    {
+      "textureId": "grass",
+      "walkable": true
+    },
+    {
+      "textureId": "grass",
+      "walkable": true
+    },
+    {
+      "textureId": "stone",
+      "walkable": false
+    },
+    {
+      "textureId": "grass",
+      "walkable": true
+    },
+    {
+      "textureId": "grass",
+      "walkable": true
+    },
+    {
+      "textureId": "grass",
+      "walkable": true
+    },
+    {
+      "textureId": "grass",
+      "walkable": true
+    },
+    {
+      "textureId": "grass",
+      "walkable": true
+    },
+    {
+      "textureId": "grass",
+      "walkable": true
+    },
+    {
+      "textureId": "grass",
+      "walkable": true
+    },
+    {
+      "textureId": "grass",
+      "walkable": true
+    },
+    {
+      "textureId": "grass",
+      "walkable": true
+    },
+    {
+      "textureId": "grass",
+      "walkable": true
+    },
+    {
+      "textureId": "grass",
+      "walkable": true
+    },
+    {
+      "textureId": "grass",
+      "walkable": true
+    },
+    {
+      "textureId": "grass",
+      "walkable": true
+    },
+    {
+      "textureId": "grass",
+      "walkable": true
+    },
+    {
+      "textureId": "grass",
+      "walkable": true
+    },
+    {
+      "textureId": "grass",
+      "walkable": true
+    },
+    {
+      "textureId": "grass",
+      "walkable": true
+    },
+    {
+      "textureId": "grass",
+      "walkable": true
+    },
+    {
+      "textureId": "grass",
+      "walkable": true
+    },
+    {
+      "textureId": "stone",
+      "walkable": false
+    },
+    {
+      "textureId": "grass",
+      "walkable": true
+    },
+    {
+      "textureId": "grass",
+      "walkable": true
+    },
+    {
+      "textureId": "grass",
+      "walkable": true
+    },
+    {
+      "textureId": "grass",
+      "walkable": true
+    },
+    {
+      "textureId": "grass",
+      "walkable": true
+    },
+    {
+      "textureId": "grass",
+      "walkable": true
+    },
+    {
+      "textureId": "grass",
+      "walkable": true
+    },
+    {
+      "textureId": "grass",
+      "walkable": true
+    },
+    {
+      "textureId": "grass",
+      "walkable": true
+    },
+    {
+      "textureId": "grass",
+      "walkable": true
+    },
+    {
+      "textureId": "grass",
+      "walkable": true
+    },
+    {
+      "textureId": "grass",
+      "walkable": true
+    },
+    {
+      "textureId": "grass",
+      "walkable": true
+    },
+    {
+      "textureId": "grass",
+      "walkable": true
+    },
+    {
+      "textureId": "grass",
+      "walkable": true
+    },
+    {
+      "textureId": "grass",
+      "walkable": true
+    },
+    {
+      "textureId": "grass",
+      "walkable": true
+    },
+    {
+      "textureId": "grass",
+      "walkable": true
+    },
+    {
+      "textureId": "grass",
+      "walkable": true
+    },
+    {
+      "textureId": "stone",
+      "walkable": false
+    },
+    {
+      "textureId": "grass",
+      "walkable": true
+    },
+    {
+      "textureId": "grass",
+      "walkable": true
+    },
+    {
+      "textureId": "grass",
+      "walkable": true
+    },
+    {
+      "textureId": "grass",
+      "walkable": true
+    },
+    {
+      "textureId": "grass",
+      "walkable": true
+    },
+    {
+      "textureId": "grass",
+      "walkable": true
+    },
+    {
+      "textureId": "grass",
+      "walkable": true
+    },
+    {
+      "textureId": "grass",
+      "walkable": true
+    },
+    {
+      "textureId": "grass",
+      "walkable": true
+    },
+    {
+      "textureId": "grass",
+      "walkable": true
+    },
+    {
+      "textureId": "grass",
+      "walkable": true
+    },
+    {
+      "textureId": "grass",
+      "walkable": true
+    },
+    {
+      "textureId": "grass",
+      "walkable": true
+    },
+    {
+      "textureId": "grass",
+      "walkable": true
+    },
+    {
+      "textureId": "grass",
+      "walkable": true
+    },
+    {
+      "textureId": "grass",
+      "walkable": true
+    },
+    {
+      "textureId": "grass",
+      "walkable": true
+    },
+    {
+      "textureId": "grass",
+      "walkable": true
+    },
+    {
+      "textureId": "grass",
+      "walkable": true
+    },
+    {
+      "textureId": "stone",
+      "walkable": false
+    },
+    {
+      "textureId": "grass",
+      "walkable": true
+    },
+    {
+      "textureId": "grass",
+      "walkable": true
+    },
+    {
+      "textureId": "grass",
+      "walkable": true
+    },
+    {
+      "textureId": "grass",
+      "walkable": true
+    },
+    {
+      "textureId": "grass",
+      "walkable": true
+    },
+    {
+      "textureId": "grass",
+      "walkable": true
+    },
+    {
+      "textureId": "grass",
+      "walkable": true
+    },
+    {
+      "textureId": "grass",
+      "walkable": true
+    },
+    {
+      "textureId": "grass",
+      "walkable": true
+    },
+    {
+      "textureId": "grass",
+      "walkable": true
+    },
+    {
+      "textureId": "grass",
+      "walkable": true
+    },
+    {
+      "textureId": "grass",
+      "walkable": true
+    },
+    {
+      "textureId": "grass",
+      "walkable": true
+    },
+    {
+      "textureId": "grass",
+      "walkable": true
+    },
+    {
+      "textureId": "grass",
+      "walkable": true
+    },
+    {
+      "textureId": "grass",
+      "walkable": true
+    },
+    {
+      "textureId": "grass",
+      "walkable": true
+    },
+    {
+      "textureId": "grass",
+      "walkable": true
+    },
+    {
+      "textureId": "grass",
+      "walkable": true
+    },
+    {
+      "textureId": "stone",
+      "walkable": false
+    },
+    {
+      "textureId": "grass",
+      "walkable": true
+    },
+    {
+      "textureId": "grass",
+      "walkable": true
+    },
+    {
+      "textureId": "grass",
+      "walkable": true
+    },
+    {
+      "textureId": "grass",
+      "walkable": true
+    },
+    {
+      "textureId": "grass",
+      "walkable": true
+    },
+    {
+      "textureId": "grass",
+      "walkable": true
+    },
+    {
+      "textureId": "grass",
+      "walkable": true
+    },
+    {
+      "textureId": "grass",
+      "walkable": true
+    },
+    {
+      "textureId": "grass",
+      "walkable": true
+    },
+    {
+      "textureId": "grass",
+      "walkable": true
+    },
+    {
+      "textureId": "grass",
+      "walkable": true
+    },
+    {
+      "textureId": "grass",
+      "walkable": true
+    },
+    {
+      "textureId": "grass",
+      "walkable": true
+    },
+    {
+      "textureId": "grass",
+      "walkable": true
+    },
+    {
+      "textureId": "grass",
+      "walkable": true
+    },
+    {
+      "textureId": "grass",
+      "walkable": true
+    },
+    {
+      "textureId": "grass",
+      "walkable": true
+    },
+    {
+      "textureId": "grass",
+      "walkable": true
+    },
+    {
+      "textureId": "grass",
+      "walkable": true
+    },
+    {
+      "textureId": "grass",
+      "walkable": true
+    },
+    {
+      "textureId": "grass",
+      "walkable": true
+    },
+    {
+      "textureId": "grass",
+      "walkable": true
+    },
+    {
+      "textureId": "grass",
+      "walkable": true
+    },
+    {
+      "textureId": "grass",
+      "walkable": true
+    },
+    {
+      "textureId": "grass",
+      "walkable": true
+    },
+    {
+      "textureId": "grass",
+      "walkable": true
+    },
+    {
+      "textureId": "grass",
+      "walkable": true
+    },
+    {
+      "textureId": "grass",
+      "walkable": true
+    },
+    {
+      "textureId": "grass",
+      "walkable": true
+    },
+    {
+      "textureId": "grass",
+      "walkable": true
+    },
+    {
+      "textureId": "grass",
+      "walkable": true
+    },
+    {
+      "textureId": "grass",
+      "walkable": true
+    },
+    {
+      "textureId": "grass",
+      "walkable": true
+    },
+    {
+      "textureId": "grass",
+      "walkable": true
+    },
+    {
+      "textureId": "grass",
+      "walkable": true
+    },
+    {
+      "textureId": "grass",
+      "walkable": true
+    },
+    {
+      "textureId": "grass",
+      "walkable": true
+    },
+    {
+      "textureId": "grass",
+      "walkable": true
+    },
+    {
+      "textureId": "grass",
+      "walkable": true
+    },
+    {
+      "textureId": "grass",
+      "walkable": true
+    },
+    {
+      "textureId": "grass",
+      "walkable": true
+    },
+    {
+      "textureId": "grass",
+      "walkable": true
+    },
+    {
+      "textureId": "grass",
+      "walkable": true
+    },
+    {
+      "textureId": "grass",
+      "walkable": true
+    },
+    {
+      "textureId": "grass",
+      "walkable": true
+    },
+    {
+      "textureId": "grass",
+      "walkable": true
+    },
+    {
+      "textureId": "grass",
+      "walkable": true
+    },
+    {
+      "textureId": "grass",
+      "walkable": true
+    },
+    {
+      "textureId": "grass",
+      "walkable": true
+    },
+    {
+      "textureId": "grass",
+      "walkable": true
+    },
+    {
+      "textureId": "grass",
+      "walkable": true
+    },
+    {
+      "textureId": "grass",
+      "walkable": true
+    },
+    {
+      "textureId": "grass",
+      "walkable": true
+    },
+    {
+      "textureId": "grass",
+      "walkable": true
+    },
+    {
+      "textureId": "grass",
+      "walkable": true
+    },
+    {
+      "textureId": "grass",
+      "walkable": true
+    },
+    {
+      "textureId": "grass",
+      "walkable": true
+    },
+    {
+      "textureId": "grass",
+      "walkable": true
+    },
+    {
+      "textureId": "grass",
+      "walkable": true
+    },
+    {
+      "textureId": "grass",
+      "walkable": true
+    },
+    {
+      "textureId": "grass",
+      "walkable": true
+    },
+    {
+      "textureId": "grass",
+      "walkable": true
+    },
+    {
+      "textureId": "grass",
+      "walkable": true
+    },
+    {
+      "textureId": "grass",
+      "walkable": true
+    },
+    {
+      "textureId": "grass",
+      "walkable": true
+    },
+    {
+      "textureId": "grass",
+      "walkable": true
+    },
+    {
+      "textureId": "grass",
+      "walkable": true
+    },
+    {
+      "textureId": "grass",
+      "walkable": true
+    },
+    {
+      "textureId": "grass",
+      "walkable": true
+    },
+    {
+      "textureId": "grass",
+      "walkable": true
+    },
+    {
+      "textureId": "grass",
+      "walkable": true
+    },
+    {
+      "textureId": "grass",
+      "walkable": true
+    },
+    {
+      "textureId": "grass",
+      "walkable": true
+    },
+    {
+      "textureId": "grass",
+      "walkable": true
+    },
+    {
+      "textureId": "grass",
+      "walkable": true
+    },
+    {
+      "textureId": "grass",
+      "walkable": true
+    },
+    {
+      "textureId": "grass",
+      "walkable": true
+    },
+    {
+      "textureId": "grass",
+      "walkable": true
+    },
+    {
+      "textureId": "grass",
+      "walkable": true
+    },
+    {
+      "textureId": "grass",
+      "walkable": true
+    },
+    {
+      "textureId": "grass",
+      "walkable": true
+    },
+    {
+      "textureId": "grass",
+      "walkable": true
+    },
+    {
+      "textureId": "grass",
+      "walkable": true
+    },
+    {
+      "textureId": "grass",
+      "walkable": true
+    },
+    {
+      "textureId": "grass",
+      "walkable": true
+    },
+    {
+      "textureId": "grass",
+      "walkable": true
+    },
+    {
+      "textureId": "grass",
+      "walkable": true
+    },
+    {
+      "textureId": "grass",
+      "walkable": true
+    },
+    {
+      "textureId": "grass",
+      "walkable": true
+    },
+    {
+      "textureId": "grass",
+      "walkable": true
+    },
+    {
+      "textureId": "grass",
+      "walkable": true
+    },
+    {
+      "textureId": "grass",
+      "walkable": true
+    },
+    {
+      "textureId": "grass",
+      "walkable": true
+    },
+    {
+      "textureId": "grass",
+      "walkable": true
+    },
+    {
+      "textureId": "grass",
+      "walkable": true
+    },
+    {
+      "textureId": "grass",
+      "walkable": true
+    },
+    {
+      "textureId": "grass",
+      "walkable": true
+    },
+    {
+      "textureId": "grass",
+      "walkable": true
+    },
+    {
+      "textureId": "grass",
+      "walkable": true
+    },
+    {
+      "textureId": "grass",
+      "walkable": true
+    },
+    {
+      "textureId": "grass",
+      "walkable": true
+    },
+    {
+      "textureId": "grass",
+      "walkable": true
+    },
+    {
+      "textureId": "grass",
+      "walkable": true
+    },
+    {
+      "textureId": "grass",
+      "walkable": true
+    },
+    {
+      "textureId": "grass",
+      "walkable": true
+    },
+    {
+      "textureId": "grass",
+      "walkable": true
+    },
+    {
+      "textureId": "grass",
+      "walkable": true
+    },
+    {
+      "textureId": "grass",
+      "walkable": true
+    },
+    {
+      "textureId": "grass",
+      "walkable": true
+    },
+    {
+      "textureId": "grass",
+      "walkable": true
+    },
+    {
+      "textureId": "grass",
+      "walkable": true
+    },
+    {
+      "textureId": "grass",
+      "walkable": true
+    },
+    {
+      "textureId": "grass",
+      "walkable": true
+    },
+    {
+      "textureId": "grass",
+      "walkable": true
+    },
+    {
+      "textureId": "grass",
+      "walkable": true
+    },
+    {
+      "textureId": "grass",
+      "walkable": true
+    },
+    {
+      "textureId": "grass",
+      "walkable": true
+    },
+    {
+      "textureId": "grass",
+      "walkable": true
+    },
+    {
+      "textureId": "grass",
+      "walkable": true
+    },
+    {
+      "textureId": "grass",
+      "walkable": true
+    },
+    {
+      "textureId": "grass",
+      "walkable": true
+    },
+    {
+      "textureId": "grass",
+      "walkable": true
+    },
+    {
+      "textureId": "grass",
+      "walkable": true
+    },
+    {
+      "textureId": "grass",
+      "walkable": true
+    },
+    {
+      "textureId": "grass",
+      "walkable": true
+    },
+    {
+      "textureId": "grass",
+      "walkable": true
+    },
+    {
+      "textureId": "grass",
+      "walkable": true
+    },
+    {
+      "textureId": "grass",
+      "walkable": true
+    },
+    {
+      "textureId": "grass",
+      "walkable": true
+    },
+    {
+      "textureId": "grass",
+      "walkable": true
+    },
+    {
+      "textureId": "grass",
+      "walkable": true
+    },
+    {
+      "textureId": "grass",
+      "walkable": true
+    },
+    {
+      "textureId": "grass",
+      "walkable": true
+    },
+    {
+      "textureId": "grass",
+      "walkable": true
+    },
+    {
+      "textureId": "grass",
+      "walkable": true
+    },
+    {
+      "textureId": "grass",
+      "walkable": true
+    },
+    {
+      "textureId": "grass",
+      "walkable": true
+    },
+    {
+      "textureId": "grass",
+      "walkable": true
+    },
+    {
+      "textureId": "grass",
+      "walkable": true
+    },
+    {
+      "textureId": "grass",
+      "walkable": true
+    },
+    {
+      "textureId": "grass",
+      "walkable": true
+    },
+    {
+      "textureId": "grass",
+      "walkable": true
+    },
+    {
+      "textureId": "grass",
+      "walkable": true
+    },
+    {
+      "textureId": "grass",
+      "walkable": true
+    },
+    {
+      "textureId": "grass",
+      "walkable": true
+    },
+    {
+      "textureId": "grass",
+      "walkable": true
+    },
+    {
+      "textureId": "grass",
+      "walkable": true
+    },
+    {
+      "textureId": "grass",
+      "walkable": true
+    },
+    {
+      "textureId": "grass",
+      "walkable": true
+    },
+    {
+      "textureId": "grass",
+      "walkable": true
+    },
+    {
+      "textureId": "grass",
+      "walkable": true
+    },
+    {
+      "textureId": "grass",
+      "walkable": true
+    },
+    {
+      "textureId": "grass",
+      "walkable": true
+    },
+    {
+      "textureId": "grass",
+      "walkable": true
+    },
+    {
+      "textureId": "grass",
+      "walkable": true
+    },
+    {
+      "textureId": "grass",
+      "walkable": true
+    },
+    {
+      "textureId": "grass",
+      "walkable": true
+    },
+    {
+      "textureId": "grass",
+      "walkable": true
+    },
+    {
+      "textureId": "grass",
+      "walkable": true
+    },
+    {
+      "textureId": "grass",
+      "walkable": true
+    },
+    {
+      "textureId": "grass",
+      "walkable": true
+    },
+    {
+      "textureId": "grass",
+      "walkable": true
+    },
+    {
+      "textureId": "grass",
+      "walkable": true
+    },
+    {
+      "textureId": "grass",
+      "walkable": true
+    },
+    {
+      "textureId": "grass",
+      "walkable": true
+    },
+    {
+      "textureId": "grass",
+      "walkable": true
+    },
+    {
+      "textureId": "grass",
+      "walkable": true
+    },
+    {
+      "textureId": "grass",
+      "walkable": true
+    },
+    {
+      "textureId": "grass",
+      "walkable": true
+    },
+    {
+      "textureId": "grass",
+      "walkable": true
+    },
+    {
+      "textureId": "grass",
+      "walkable": true
+    },
+    {
+      "textureId": "grass",
+      "walkable": true
+    },
+    {
+      "textureId": "grass",
+      "walkable": true
+    },
+    {
+      "textureId": "grass",
+      "walkable": true
+    },
+    {
+      "textureId": "grass",
+      "walkable": true
+    },
+    {
+      "textureId": "grass",
+      "walkable": true
+    },
+    {
+      "textureId": "grass",
+      "walkable": true
+    },
+    {
+      "textureId": "grass",
+      "walkable": true
+    },
+    {
+      "textureId": "grass",
+      "walkable": true
+    },
+    {
+      "textureId": "grass",
+      "walkable": true
+    },
+    {
+      "textureId": "grass",
+      "walkable": true
+    },
+    {
+      "textureId": "grass",
+      "walkable": true
+    },
+    {
+      "textureId": "grass",
+      "walkable": true
+    },
+    {
+      "textureId": "grass",
+      "walkable": true
+    },
+    {
+      "textureId": "grass",
+      "walkable": true
+    },
+    {
+      "textureId": "grass",
+      "walkable": true
+    },
+    {
+      "textureId": "grass",
+      "walkable": true
+    },
+    {
+      "textureId": "grass",
+      "walkable": true
+    },
+    {
+      "textureId": "grass",
+      "walkable": true
+    },
+    {
+      "textureId": "grass",
+      "walkable": true
+    },
+    {
+      "textureId": "grass",
+      "walkable": true
+    }
+  ]
+}

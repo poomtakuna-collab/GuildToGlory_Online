@@ -1,5 +1,9 @@
 import { describe, expect, it } from "vitest";
-import { isPingMessage, isWorldDestinationMessage, isWorldStateMessage } from "../src/messages.js";
+import {
+  isPingMessage,
+  isWorldDestinationMessage,
+  isWorldStateMessage
+} from "../src/messages.js";
 
 describe("isPingMessage", () => {
   it("accepts a finite client timestamp", () => {
@@ -32,6 +36,7 @@ describe("isWorldStateMessage", () => {
 
   it("rejects malformed positions", () => {
     expect(isWorldStateMessage({ players: [{ id: "a", name: "Adventurer 1", color: 123, x: NaN, y: 20 }] })).toBe(false);
+    expect(isWorldStateMessage({ players: [{ id: "a", name: "Adventurer 1", color: 123, x: 10, y: Infinity }] })).toBe(false);
     expect(isWorldStateMessage({ players: "invalid" })).toBe(false);
   });
 });

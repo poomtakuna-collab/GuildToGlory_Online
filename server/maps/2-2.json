@@ -1,0 +1,1607 @@
+{
+  "schemaVersion": 2,
+  "width": 20,
+  "height": 20,
+  "tiles": [
+    {
+      "textureId": "dirt",
+      "walkable": true
+    },
+    {
+      "textureId": "dirt",
+      "walkable": true
+    },
+    {
+      "textureId": "dirt",
+      "walkable": true
+    },
+    {
+      "textureId": "dirt",
+      "walkable": true
+    },
+    {
+      "textureId": "dirt",
+      "walkable": true
+    },
+    {
+      "textureId": "dirt",
+      "walkable": true
+    },
+    {
+      "textureId": "dirt",
+      "walkable": true
+    },
+    {
+      "textureId": "dirt",
+      "walkable": true
+    },
+    {
+      "textureId": "dirt",
+      "walkable": true
+    },
+    {
+      "textureId": "dirt",
+      "walkable": true
+    },
+    {
+      "textureId": "dirt",
+      "walkable": true
+    },
+    {
+      "textureId": "dirt",
+      "walkable": true
+    },
+    {
+      "textureId": "dirt",
+      "walkable": true
+    },
+    {
+      "textureId": "dirt",
+      "walkable": true
+    },
+    {
+      "textureId": "dirt",
+      "walkable": true
+    },
+    {
+      "textureId": "dirt",
+      "walkable": true
+    },
+    {
+      "textureId": "dirt",
+      "walkable": true
+    },
+    {
+      "textureId": "dirt",
+      "walkable": true
+    },
+    {
+      "textureId": "dirt",
+      "walkable": true
+    },
+    {
+      "textureId": "dirt",
+      "walkable": true
+    },
+    {
+      "textureId": "dirt",
+      "walkable": true
+    },
+    {
+      "textureId": "dirt",
+      "walkable": true
+    },
+    {
+      "textureId": "dirt",
+      "walkable": true
+    },
+    {
+      "textureId": "dirt",
+      "walkable": true
+    },
+    {
+      "textureId": "dirt",
+      "walkable": true
+    },
+    {
+      "textureId": "dirt",
+      "walkable": true
+    },
+    {
+      "textureId": "dirt",
+      "walkable": true
+    },
+    {
+      "textureId": "dirt",
+      "walkable": true
+    },
+    {
+      "textureId": "dirt",
+      "walkable": true
+    },
+    {
+      "textureId": "dirt",
+      "walkable": true
+    },
+    {
+      "textureId": "dirt",
+      "walkable": true
+    },
+    {
+      "textureId": "dirt",
+      "walkable": true
+    },
+    {
+      "textureId": "dirt",
+      "walkable": true
+    },
+    {
+      "textureId": "dirt",
+      "walkable": true
+    },
+    {
+      "textureId": "dirt",
+      "walkable": true
+    },
+    {
+      "textureId": "dirt",
+      "walkable": true
+    },
+    {
+      "textureId": "dirt",
+      "walkable": true
+    },
+    {
+      "textureId": "dirt",
+      "walkable": true
+    },
+    {
+      "textureId": "dirt",
+      "walkable": true
+    },
+    {
+      "textureId": "dirt",
+      "walkable": true
+    },
+    {
+      "textureId": "dirt",
+      "walkable": true
+    },
+    {
+      "textureId": "dirt",
+      "walkable": true
+    },
+    {
+      "textureId": "dirt",
+      "walkable": true
+    },
+    {
+      "textureId": "dirt",
+      "walkable": true
+    },
+    {
+      "textureId": "dirt",
+      "walkable": true
+    },
+    {
+      "textureId": "dirt",
+      "walkable": true
+    },
+    {
+      "textureId": "dirt",
+      "walkable": true
+    },
+    {
+      "textureId": "dirt",
+      "walkable": true
+    },
+    {
+      "textureId": "dirt",
+      "walkable": true
+    },
+    {
+      "textureId": "dirt",
+      "walkable": true
+    },
+    {
+      "textureId": "dirt",
+      "walkable": true
+    },
+    {
+      "textureId": "dirt",
+      "walkable": true
+    },
+    {
+      "textureId": "dirt",
+      "walkable": true
+    },
+    {
+      "textureId": "dirt",
+      "walkable": true
+    },
+    {
+      "textureId": "dirt",
+      "walkable": true
+    },
+    {
+      "textureId": "dirt",
+      "walkable": true
+    },
+    {
+      "textureId": "dirt",
+      "walkable": true
+    },
+    {
+      "textureId": "dirt",
+      "walkable": true
+    },
+    {
+      "textureId": "dirt",
+      "walkable": true
+    },
+    {
+      "textureId": "dirt",
+      "walkable": true
+    },
+    {
+      "textureId": "dirt",
+      "walkable": true
+    },
+    {
+      "textureId": "dirt",
+      "walkable": true
+    },
+    {
+      "textureId": "dirt",
+      "walkable": true
+    },
+    {
+      "textureId": "dirt",
+      "walkable": true
+    },
+    {
+      "textureId": "dirt",
+      "walkable": true
+    },
+    {
+      "textureId": "dirt",
+      "walkable": true
+    },
+    {
+      "textureId": "dirt",
+      "walkable": true
+    },
+    {
+      "textureId": "dirt",
+      "walkable": true
+    },
+    {
+      "textureId": "dirt",
+      "walkable": true
+    },
+    {
+      "textureId": "dirt",
+      "walkable": true
+    },
+    {
+      "textureId": "dirt",
+      "walkable": true
+    },
+    {
+      "textureId": "dirt",
+      "walkable": true
+    },
+    {
+      "textureId": "dirt",
+      "walkable": true
+    },
+    {
+      "textureId": "dirt",
+      "walkable": true
+    },
+    {
+      "textureId": "dirt",
+      "walkable": true
+    },
+    {
+      "textureId": "dirt",
+      "walkable": true
+    },
+    {
+      "textureId": "dirt",
+      "walkable": true
+    },
+    {
+      "textureId": "dirt",
+      "walkable": true
+    },
+    {
+      "textureId": "dirt",
+      "walkable": true
+    },
+    {
+      "textureId": "dirt",
+      "walkable": true
+    },
+    {
+      "textureId": "dirt",
+      "walkable": true
+    },
+    {
+      "textureId": "dirt",
+      "walkable": true
+    },
+    {
+      "textureId": "dirt",
+      "walkable": true
+    },
+    {
+      "textureId": "dirt",
+      "walkable": true
+    },
+    {
+      "textureId": "dirt",
+      "walkable": true
+    },
+    {
+      "textureId": "dirt",
+      "walkable": true
+    },
+    {
+      "textureId": "dirt",
+      "walkable": true
+    },
+    {
+      "textureId": "dirt",
+      "walkable": true
+    },
+    {
+      "textureId": "dirt",
+      "walkable": true
+    },
+    {
+      "textureId": "dirt",
+      "walkable": true
+    },
+    {
+      "textureId": "dirt",
+      "walkable": true
+    },
+    {
+      "textureId": "dirt",
+      "walkable": true
+    },
+    {
+      "textureId": "dirt",
+      "walkable": true
+    },
+    {
+      "textureId": "dirt",
+      "walkable": true
+    },
+    {
+      "textureId": "dirt",
+      "walkable": true
+    },
+    {
+      "textureId": "dirt",
+      "walkable": true
+    },
+    {
+      "textureId": "dirt",
+      "walkable": true
+    },
+    {
+      "textureId": "dirt",
+      "walkable": true
+    },
+    {
+      "textureId": "dirt",
+      "walkable": true
+    },
+    {
+      "textureId": "dirt",
+      "walkable": true
+    },
+    {
+      "textureId": "dirt",
+      "walkable": true
+    },
+    {
+      "textureId": "dirt",
+      "walkable": true
+    },
+    {
+      "textureId": "dirt",
+      "walkable": true
+    },
+    {
+      "textureId": "dirt",
+      "walkable": true
+    },
+    {
+      "textureId": "dirt",
+      "walkable": true
+    },
+    {
+      "textureId": "dirt",
+      "walkable": true
+    },
+    {
+      "textureId": "dirt",
+      "walkable": true
+    },
+    {
+      "textureId": "dirt",
+      "walkable": true
+    },
+    {
+      "textureId": "dirt",
+      "walkable": true
+    },
+    {
+      "textureId": "dirt",
+      "walkable": true
+    },
+    {
+      "textureId": "dirt",
+      "walkable": true
+    },
+    {
+      "textureId": "dirt",
+      "walkable": true
+    },
+    {
+      "textureId": "dirt",
+      "walkable": true
+    },
+    {
+      "textureId": "dirt",
+      "walkable": true
+    },
+    {
+      "textureId": "dirt",
+      "walkable": true
+    },
+    {
+      "textureId": "dirt",
+      "walkable": true
+    },
+    {
+      "textureId": "dirt",
+      "walkable": true
+    },
+    {
+      "textureId": "dirt",
+      "walkable": true
+    },
+    {
+      "textureId": "dirt",
+      "walkable": true
+    },
+    {
+      "textureId": "dirt",
+      "walkable": true
+    },
+    {
+      "textureId": "dirt",
+      "walkable": true
+    },
+    {
+      "textureId": "dirt",
+      "walkable": true
+    },
+    {
+      "textureId": "dirt",
+      "walkable": true
+    },
+    {
+      "textureId": "dirt",
+      "walkable": true
+    },
+    {
+      "textureId": "dirt",
+      "walkable": true
+    },
+    {
+      "textureId": "dirt",
+      "walkable": true
+    },
+    {
+      "textureId": "dirt",
+      "walkable": true
+    },
+    {
+      "textureId": "dirt",
+      "walkable": true
+    },
+    {
+      "textureId": "dirt",
+      "walkable": true
+    },
+    {
+      "textureId": "dirt",
+      "walkable": true
+    },
+    {
+      "textureId": "dirt",
+      "walkable": true
+    },
+    {
+      "textureId": "dirt",
+      "walkable": true
+    },
+    {
+      "textureId": "dirt",
+      "walkable": true
+    },
+    {
+      "textureId": "dirt",
+      "walkable": true
+    },
+    {
+      "textureId": "dirt",
+      "walkable": true
+    },
+    {
+      "textureId": "dirt",
+      "walkable": true
+    },
+    {
+      "textureId": "dirt",
+      "walkable": true
+    },
+    {
+      "textureId": "dirt",
+      "walkable": true
+    },
+    {
+      "textureId": "dirt",
+      "walkable": true
+    },
+    {
+      "textureId": "dirt",
+      "walkable": true
+    },
+    {
+      "textureId": "dirt",
+      "walkable": true
+    },
+    {
+      "textureId": "dirt",
+      "walkable": true
+    },
+    {
+      "textureId": "dirt",
+      "walkable": true
+    },
+    {
+      "textureId": "dirt",
+      "walkable": true
+    },
+    {
+      "textureId": "dirt",
+      "walkable": true
+    },
+    {
+      "textureId": "dirt",
+      "walkable": true
+    },
+    {
+      "textureId": "dirt",
+      "walkable": true
+    },
+    {
+      "textureId": "dirt",
+      "walkable": true
+    },
+    {
+      "textureId": "dirt",
+      "walkable": true
+    },
+    {
+      "textureId": "dirt",
+      "walkable": true
+    },
+    {
+      "textureId": "dirt",
+      "walkable": true
+    },
+    {
+      "textureId": "dirt",
+      "walkable": true
+    },
+    {
+      "textureId": "dirt",
+      "walkable": true
+    },
+    {
+      "textureId": "dirt",
+      "walkable": true
+    },
+    {
+      "textureId": "dirt",
+      "walkable": true
+    },
+    {
+      "textureId": "dirt",
+      "walkable": true
+    },
+    {
+      "textureId": "dirt",
+      "walkable": true
+    },
+    {
+      "textureId": "dirt",
+      "walkable": true
+    },
+    {
+      "textureId": "dirt",
+      "walkable": true
+    },
+    {
+      "textureId": "dirt",
+      "walkable": true
+    },
+    {
+      "textureId": "dirt",
+      "walkable": true
+    },
+    {
+      "textureId": "dirt",
+      "walkable": true
+    },
+    {
+      "textureId": "dirt",
+      "walkable": true
+    },
+    {
+      "textureId": "dirt",
+      "walkable": true
+    },
+    {
+      "textureId": "dirt",
+      "walkable": true
+    },
+    {
+      "textureId": "dirt",
+      "walkable": true
+    },
+    {
+      "textureId": "dirt",
+      "walkable": true
+    },
+    {
+      "textureId": "dirt",
+      "walkable": true
+    },
+    {
+      "textureId": "dirt",
+      "walkable": true
+    },
+    {
+      "textureId": "dirt",
+      "walkable": true
+    },
+    {
+      "textureId": "dirt",
+      "walkable": true
+    },
+    {
+      "textureId": "dirt",
+      "walkable": true
+    },
+    {
+      "textureId": "dirt",
+      "walkable": true
+    },
+    {
+      "textureId": "dirt",
+      "walkable": true
+    },
+    {
+      "textureId": "dirt",
+      "walkable": true
+    },
+    {
+      "textureId": "dirt",
+      "walkable": true
+    },
+    {
+      "textureId": "dirt",
+      "walkable": true
+    },
+    {
+      "textureId": "dirt",
+      "walkable": true
+    },
+    {
+      "textureId": "dirt",
+      "walkable": true
+    },
+    {
+      "textureId": "dirt",
+      "walkable": true
+    },
+    {
+      "textureId": "dirt",
+      "walkable": true
+    },
+    {
+      "textureId": "dirt",
+      "walkable": true
+    },
+    {
+      "textureId": "dirt",
+      "walkable": true
+    },
+    {
+      "textureId": "dirt",
+      "walkable": true
+    },
+    {
+      "textureId": "dirt",
+      "walkable": true
+    },
+    {
+      "textureId": "dirt",
+      "walkable": true
+    },
+    {
+      "textureId": "dirt",
+      "walkable": true
+    },
+    {
+      "textureId": "dirt",
+      "walkable": true
+    },
+    {
+      "textureId": "dirt",
+      "walkable": true
+    },
+    {
+      "textureId": "dirt",
+      "walkable": true
+    },
+    {
+      "textureId": "dirt",
+      "walkable": true
+    },
+    {
+      "textureId": "dirt",
+      "walkable": true
+    },
+    {
+      "textureId": "dirt",
+      "walkable": true
+    },
+    {
+      "textureId": "dirt",
+      "walkable": true
+    },
+    {
+      "textureId": "dirt",
+      "walkable": true
+    },
+    {
+      "textureId": "dirt",
+      "walkable": true
+    },
+    {
+      "textureId": "dirt",
+      "walkable": true
+    },
+    {
+      "textureId": "dirt",
+      "walkable": true
+    },
+    {
+      "textureId": "dirt",
+      "walkable": true
+    },
+    {
+      "textureId": "dirt",
+      "walkable": true
+    },
+    {
+      "textureId": "dirt",
+      "walkable": true
+    },
+    {
+      "textureId": "dirt",
+      "walkable": true
+    },
+    {
+      "textureId": "dirt",
+      "walkable": true
+    },
+    {
+      "textureId": "dirt",
+      "walkable": true
+    },
+    {
+      "textureId": "dirt",
+      "walkable": true
+    },
+    {
+      "textureId": "dirt",
+      "walkable": true
+    },
+    {
+      "textureId": "dirt",
+      "walkable": true
+    },
+    {
+      "textureId": "dirt",
+      "walkable": true
+    },
+    {
+      "textureId": "dirt",
+      "walkable": true
+    },
+    {
+      "textureId": "dirt",
+      "walkable": true
+    },
+    {
+      "textureId": "dirt",
+      "walkable": true
+    },
+    {
+      "textureId": "dirt",
+      "walkable": true
+    },
+    {
+      "textureId": "dirt",
+      "walkable": true
+    },
+    {
+      "textureId": "dirt",
+      "walkable": true
+    },
+    {
+      "textureId": "dirt",
+      "walkable": true
+    },
+    {
+      "textureId": "dirt",
+      "walkable": true
+    },
+    {
+      "textureId": "dirt",
+      "walkable": true
+    },
+    {
+      "textureId": "dirt",
+      "walkable": true
+    },
+    {
+      "textureId": "dirt",
+      "walkable": true
+    },
+    {
+      "textureId": "dirt",
+      "walkable": true
+    },
+    {
+      "textureId": "dirt",
+      "walkable": true
+    },
+    {
+      "textureId": "dirt",
+      "walkable": true
+    },
+    {
+      "textureId": "dirt",
+      "walkable": true
+    },
+    {
+      "textureId": "dirt",
+      "walkable": true
+    },
+    {
+      "textureId": "dirt",
+      "walkable": true
+    },
+    {
+      "textureId": "dirt",
+      "walkable": true
+    },
+    {
+      "textureId": "dirt",
+      "walkable": true
+    },
+    {
+      "textureId": "dirt",
+      "walkable": true
+    },
+    {
+      "textureId": "dirt",
+      "walkable": true
+    },
+    {
+      "textureId": "dirt",
+      "walkable": true
+    },
+    {
+      "textureId": "dirt",
+      "walkable": true
+    },
+    {
+      "textureId": "dirt",
+      "walkable": true
+    },
+    {
+      "textureId": "dirt",
+      "walkable": true
+    },
+    {
+      "textureId": "dirt",
+      "walkable": true
+    },
+    {
+      "textureId": "dirt",
+      "walkable": true
+    },
+    {
+      "textureId": "dirt",
+      "walkable": true
+    },
+    {
+      "textureId": "dirt",
+      "walkable": true
+    },
+    {
+      "textureId": "dirt",
+      "walkable": true
+    },
+    {
+      "textureId": "dirt",
+      "walkable": true
+    },
+    {
+      "textureId": "dirt",
+      "walkable": true
+    },
+    {
+      "textureId": "dirt",
+      "walkable": true
+    },
+    {
+      "textureId": "dirt",
+      "walkable": true
+    },
+    {
+      "textureId": "dirt",
+      "walkable": true
+    },
+    {
+      "textureId": "dirt",
+      "walkable": true
+    },
+    {
+      "textureId": "dirt",
+      "walkable": true
+    },
+    {
+      "textureId": "dirt",
+      "walkable": true
+    },
+    {
+      "textureId": "dirt",
+      "walkable": true
+    },
+    {
+      "textureId": "dirt",
+      "walkable": true
+    },
+    {
+      "textureId": "dirt",
+      "walkable": true
+    },
+    {
+      "textureId": "dirt",
+      "walkable": true
+    },
+    {
+      "textureId": "dirt",
+      "walkable": true
+    },
+    {
+      "textureId": "dirt",
+      "walkable": true
+    },
+    {
+      "textureId": "dirt",
+      "walkable": true
+    },
+    {
+      "textureId": "dirt",
+      "walkable": true
+    },
+    {
+      "textureId": "dirt",
+      "walkable": true
+    },
+    {
+      "textureId": "dirt",
+      "walkable": true
+    },
+    {
+      "textureId": "dirt",
+      "walkable": true
+    },
+    {
+      "textureId": "dirt",
+      "walkable": true
+    },
+    {
+      "textureId": "dirt",
+      "walkable": true
+    },
+    {
+      "textureId": "dirt",
+      "walkable": true
+    },
+    {
+      "textureId": "dirt",
+      "walkable": true
+    },
+    {
+      "textureId": "dirt",
+      "walkable": true
+    },
+    {
+      "textureId": "dirt",
+      "walkable": true
+    },
+    {
+      "textureId": "dirt",
+      "walkable": true
+    },
+    {
+      "textureId": "dirt",
+      "walkable": true
+    },
+    {
+      "textureId": "dirt",
+      "walkable": true
+    },
+    {
+      "textureId": "dirt",
+      "walkable": true
+    },
+    {
+      "textureId": "dirt",
+      "walkable": true
+    },
+    {
+      "textureId": "dirt",
+      "walkable": true
+    },
+    {
+      "textureId": "dirt",
+      "walkable": true
+    },
+    {
+      "textureId": "dirt",
+      "walkable": true
+    },
+    {
+      "textureId": "dirt",
+      "walkable": true
+    },
+    {
+      "textureId": "dirt",
+      "walkable": true
+    },
+    {
+      "textureId": "dirt",
+      "walkable": true
+    },
+    {
+      "textureId": "dirt",
+      "walkable": true
+    },
+    {
+      "textureId": "dirt",
+      "walkable": true
+    },
+    {
+      "textureId": "dirt",
+      "walkable": true
+    },
+    {
+      "textureId": "dirt",
+      "walkable": true
+    },
+    {
+      "textureId": "dirt",
+      "walkable": true
+    },
+    {
+      "textureId": "dirt",
+      "walkable": true
+    },
+    {
+      "textureId": "dirt",
+      "walkable": true
+    },
+    {
+      "textureId": "dirt",
+      "walkable": true
+    },
+    {
+      "textureId": "dirt",
+      "walkable": true
+    },
+    {
+      "textureId": "dirt",
+      "walkable": true
+    },
+    {
+      "textureId": "dirt",
+      "walkable": true
+    },
+    {
+      "textureId": "dirt",
+      "walkable": true
+    },
+    {
+      "textureId": "dirt",
+      "walkable": true
+    },
+    {
+      "textureId": "dirt",
+      "walkable": true
+    },
+    {
+      "textureId": "dirt",
+      "walkable": true
+    },
+    {
+      "textureId": "dirt",
+      "walkable": true
+    },
+    {
+      "textureId": "dirt",
+      "walkable": true
+    },
+    {
+      "textureId": "dirt",
+      "walkable": true
+    },
+    {
+      "textureId": "dirt",
+      "walkable": true
+    },
+    {
+      "textureId": "dirt",
+      "walkable": true
+    },
+    {
+      "textureId": "dirt",
+      "walkable": true
+    },
+    {
+      "textureId": "dirt",
+      "walkable": true
+    },
+    {
+      "textureId": "dirt",
+      "walkable": true
+    },
+    {
+      "textureId": "dirt",
+      "walkable": true
+    },
+    {
+      "textureId": "dirt",
+      "walkable": true
+    },
+    {
+      "textureId": "dirt",
+      "walkable": true
+    },
+    {
+      "textureId": "dirt",
+      "walkable": true
+    },
+    {
+      "textureId": "dirt",
+      "walkable": true
+    },
+    {
+      "textureId": "dirt",
+      "walkable": true
+    },
+    {
+      "textureId": "dirt",
+      "walkable": true
+    },
+    {
+      "textureId": "dirt",
+      "walkable": true
+    },
+    {
+      "textureId": "dirt",
+      "walkable": true
+    },
+    {
+      "textureId": "dirt",
+      "walkable": true
+    },
+    {
+      "textureId": "dirt",
+      "walkable": true
+    },
+    {
+      "textureId": "dirt",
+      "walkable": true
+    },
+    {
+      "textureId": "dirt",
+      "walkable": true
+    },
+    {
+      "textureId": "dirt",
+      "walkable": true
+    },
+    {
+      "textureId": "dirt",
+      "walkable": true
+    },
+    {
+      "textureId": "dirt",
+      "walkable": true
+    },
+    {
+      "textureId": "dirt",
+      "walkable": true
+    },
+    {
+      "textureId": "dirt",
+      "walkable": true
+    },
+    {
+      "textureId": "dirt",
+      "walkable": true
+    },
+    {
+      "textureId": "dirt",
+      "walkable": true
+    },
+    {
+      "textureId": "dirt",
+      "walkable": true
+    },
+    {
+      "textureId": "dirt",
+      "walkable": true
+    },
+    {
+      "textureId": "dirt",
+      "walkable": true
+    },
+    {
+      "textureId": "dirt",
+      "walkable": true
+    },
+    {
+      "textureId": "dirt",
+      "walkable": true
+    },
+    {
+      "textureId": "dirt",
+      "walkable": true
+    },
+    {
+      "textureId": "dirt",
+      "walkable": true
+    },
+    {
+      "textureId": "dirt",
+      "walkable": true
+    },
+    {
+      "textureId": "dirt",
+      "walkable": true
+    },
+    {
+      "textureId": "dirt",
+      "walkable": true
+    },
+    {
+      "textureId": "dirt",
+      "walkable": true
+    },
+    {
+      "textureId": "dirt",
+      "walkable": true
+    },
+    {
+      "textureId": "dirt",
+      "walkable": true
+    },
+    {
+      "textureId": "dirt",
+      "walkable": true
+    },
+    {
+      "textureId": "dirt",
+      "walkable": true
+    },
+    {
+      "textureId": "dirt",
+      "walkable": true
+    },
+    {
+      "textureId": "dirt",
+      "walkable": true
+    },
+    {
+      "textureId": "dirt",
+      "walkable": true
+    },
+    {
+      "textureId": "dirt",
+      "walkable": true
+    },
+    {
+      "textureId": "dirt",
+      "walkable": true
+    },
+    {
+      "textureId": "dirt",
+      "walkable": true
+    },
+    {
+      "textureId": "dirt",
+      "walkable": true
+    },
+    {
+      "textureId": "dirt",
+      "walkable": true
+    },
+    {
+      "textureId": "dirt",
+      "walkable": true
+    },
+    {
+      "textureId": "dirt",
+      "walkable": true
+    },
+    {
+      "textureId": "dirt",
+      "walkable": true
+    },
+    {
+      "textureId": "dirt",
+      "walkable": true
+    },
+    {
+      "textureId": "dirt",
+      "walkable": true
+    },
+    {
+      "textureId": "dirt",
+      "walkable": true
+    },
+    {
+      "textureId": "dirt",
+      "walkable": true
+    },
+    {
+      "textureId": "dirt",
+      "walkable": true
+    },
+    {
+      "textureId": "dirt",
+      "walkable": true
+    },
+    {
+      "textureId": "dirt",
+      "walkable": true
+    },
+    {
+      "textureId": "dirt",
+      "walkable": true
+    },
+    {
+      "textureId": "dirt",
+      "walkable": true
+    },
+    {
+      "textureId": "dirt",
+      "walkable": true
+    },
+    {
+      "textureId": "dirt",
+      "walkable": true
+    },
+    {
+      "textureId": "dirt",
+      "walkable": true
+    },
+    {
+      "textureId": "dirt",
+      "walkable": true
+    },
+    {
+      "textureId": "dirt",
+      "walkable": true
+    },
+    {
+      "textureId": "dirt",
+      "walkable": true
+    },
+    {
+      "textureId": "dirt",
+      "walkable": true
+    },
+    {
+      "textureId": "dirt",
+      "walkable": true
+    },
+    {
+      "textureId": "dirt",
+      "walkable": true
+    },
+    {
+      "textureId": "dirt",
+      "walkable": true
+    },
+    {
+      "textureId": "dirt",
+      "walkable": true
+    },
+    {
+      "textureId": "dirt",
+      "walkable": true
+    },
+    {
+      "textureId": "dirt",
+      "walkable": true
+    },
+    {
+      "textureId": "dirt",
+      "walkable": true
+    },
+    {
+      "textureId": "dirt",
+      "walkable": true
+    },
+    {
+      "textureId": "dirt",
+      "walkable": true
+    },
+    {
+      "textureId": "dirt",
+      "walkable": true
+    },
+    {
+      "textureId": "dirt",
+      "walkable": true
+    },
+    {
+      "textureId": "dirt",
+      "walkable": true
+    },
+    {
+      "textureId": "dirt",
+      "walkable": true
+    },
+    {
+      "textureId": "dirt",
+      "walkable": true
+    },
+    {
+      "textureId": "dirt",
+      "walkable": true
+    },
+    {
+      "textureId": "dirt",
+      "walkable": true
+    },
+    {
+      "textureId": "dirt",
+      "walkable": true
+    },
+    {
+      "textureId": "dirt",
+      "walkable": true
+    },
+    {
+      "textureId": "dirt",
+      "walkable": true
+    },
+    {
+      "textureId": "dirt",
+      "walkable": true
+    },
+    {
+      "textureId": "dirt",
+      "walkable": true
+    },
+    {
+      "textureId": "dirt",
+      "walkable": true
+    },
+    {
+      "textureId": "dirt",
+      "walkable": true
+    },
+    {
+      "textureId": "dirt",
+      "walkable": true
+    },
+    {
+      "textureId": "dirt",
+      "walkable": true
+    },
+    {
+      "textureId": "dirt",
+      "walkable": true
+    },
+    {
+      "textureId": "dirt",
+      "walkable": true
+    },
+    {
+      "textureId": "dirt",
+      "walkable": true
+    },
+    {
+      "textureId": "dirt",
+      "walkable": true
+    },
+    {
+      "textureId": "dirt",
+      "walkable": true
+    },
+    {
+      "textureId": "dirt",
+      "walkable": true
+    },
+    {
+      "textureId": "dirt",
+      "walkable": true
+    },
+    {
+      "textureId": "dirt",
+      "walkable": true
+    },
+    {
+      "textureId": "dirt",
+      "walkable": true
+    },
+    {
+      "textureId": "dirt",
+      "walkable": true
+    },
+    {
+      "textureId": "dirt",
+      "walkable": true
+    },
+    {
+      "textureId": "dirt",
+      "walkable": true
+    },
+    {
+      "textureId": "dirt",
+      "walkable": true
+    },
+    {
+      "textureId": "dirt",
+      "walkable": true
+    },
+    {
+      "textureId": "dirt",
+      "walkable": true
+    },
+    {
+      "textureId": "dirt",
+      "walkable": true
+    }
+  ]
+}

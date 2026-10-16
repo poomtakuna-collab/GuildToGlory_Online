@@ -58,3 +58,13 @@ shared/   TypeScript types และสัญญาการสื่อสา�
 - ความถี่การอัปเดตสถานะและนโยบายการแก้ไข latency
 - การ deploy, hosting และการจัดการ configuration/secrets
 - ขอบเขตแพ็กเกจและเครื่องมือทดสอบ/build นอกเหนือจากการใช้ Vite ตามข้อเสนอ
+
+## Implemented M4.5 World Map Foundation
+
+The earlier sections are historical architecture proposals. The implemented M4.5
+map flow is: `server/maps/registry.json` -> validated JSON map files -> server room
+navigation -> `world:map` snapshot -> client texture rendering. The server sends the
+same map data it uses for collision and A*, including embedded PNG assets. Reserved
+maps are validated but cannot be entered. Map data is cached until server restart;
+Editor maps remain local copies and are deployed only by manually replacing JSON.
+No database, map transitions or persistent player position are introduced.
