@@ -8,26 +8,76 @@
   </head>
   <body>
     <main class="game-shell">
-      <div id="pixi-root" class="world" aria-hidden="true"></div>
-      <div class="world-shade" aria-hidden="true"></div>
-
       <header class="topbar">
-        <a class="wordmark" href="/" aria-label="GuildToGlory Online home">
+        <button class="wordmark" type="button" data-section="menu" aria-label="GuildToGlory Online home">
           <span class="sigil" aria-hidden="true">G</span>
           <span>GUILD<span class="wordmark-light">TOGLORY</span></span>
-        </a>
+        </button>
+        <nav class="section-nav" aria-label="Main navigation">
+          <button type="button" data-section="menu" aria-current="page">Main Menu</button>
+          <button type="button" data-section="world">World</button>
+          <button type="button" data-section="adventurers">Adventurers</button>
+        </nav>
         <span class="edition">ONLINE WORLDS <i></i> FOUNDATION</span>
       </header>
 
-      <section class="start-panel" aria-labelledby="game-title">
-        <p class="eyebrow">A world forged together</p>
-        <h1 id="game-title">GuildToGlory <span>Online</span></h1>
-        <p class="intro">Your next chapter begins at the guild hall.</p>
+      <section id="menu-section" class="page-section menu-section" aria-labelledby="game-title">
+        <div class="start-panel">
+          <p class="eyebrow">A world forged together</p>
+          <h1 id="game-title">GuildToGlory <span>Online</span></h1>
+          <p class="intro">Your next chapter begins at the guild hall.</p>
+          <div class="menu-actions">
+            <button class="connect-button" type="button" data-section="world">Enter World</button>
+            <button class="secondary-button" type="button" data-section="adventurers">Adventurers</button>
+          </div>
+          <p class="server-address">GAME SERVER <span id="server-address"></span></p>
+        </div>
+      </section>
 
+      <section id="world-section" class="page-section world-section" aria-labelledby="world-title" hidden>
+        <div class="section-heading world-heading">
+          <div>
+            <p class="eyebrow">Shared world</p>
+            <h1 id="world-title">Guild Hall</h1>
+          </div>
+          <div id="world-info" class="world-info" hidden>
+            <span id="player-count">0 players</span>
+            <span>Click a tile to move</span>
+          </div>
+        </div>
+
+        <div class="world-stage">
+          <div id="pixi-root" class="world" aria-hidden="true"></div>
+          <div class="world-shade" aria-hidden="true"></div>
+        </div>
+
+        <div class="world-controls">
+          <div class="connection" aria-live="polite" aria-atomic="true">
+            <span id="status-indicator" class="status-indicator" data-status="disconnected"></span>
+            <div class="connection-copy">
+              <p id="connection-status" class="connection-title">Disconnected</p>
+              <p id="connection-detail" class="connection-detail">Waiting to reach the game server</p>
+            </div>
+          </div>
+          <button id="connect-button" class="connect-button" type="button">
+            <span class="button-mark" aria-hidden="true">+</span>
+            <span id="connect-label">Connect to server</span>
+          </button>
+          <span class="server-address">GAME SERVER <span id="server-address-world"></span></span>
+        </div>
+      </section>
+
+      <section id="adventurers-section" class="page-section adventurers-section" aria-labelledby="adventurers-title" hidden>
+        <div class="section-heading">
+          <div>
+            <p class="eyebrow">M3.1 Prototype</p>
+            <h1 id="adventurers-title">Adventurers</h1>
+          </div>
+          <button class="secondary-button" type="button" data-section="menu">Main Menu</button>
+        </div>
         <section class="generator" aria-labelledby="generator-title">
           <div class="generator-heading">
             <div>
-              <p class="generator-kicker">M3.1 PROTOTYPE</p>
               <h2 id="generator-title">Adventurer Generator</h2>
             </div>
             <button id="generate-button" class="generate-button" type="button">Generate</button>
@@ -66,25 +116,6 @@
             </section>
           </div>
         </section>
-
-        <div id="world-info" class="world-info" hidden>
-          <span id="player-count">0 players</span>
-          <span>WASD to move</span>
-        </div>
-
-        <div class="connection" aria-live="polite" aria-atomic="true">
-          <span id="status-indicator" class="status-indicator" data-status="disconnected"></span>
-          <div>
-            <p id="connection-status" class="connection-title">Disconnected</p>
-            <p id="connection-detail" class="connection-detail">Waiting to reach the game server</p>
-          </div>
-        </div>
-
-        <button id="connect-button" class="connect-button" type="button">
-          <span class="button-mark" aria-hidden="true">+</span>
-          <span id="connect-label">Connect to server</span>
-        </button>
-        <p class="server-address">GAME SERVER <span id="server-address"></span></p>
       </section>
 
       <footer class="bottom-bar">

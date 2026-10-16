@@ -1,18 +1,19 @@
 import { Client, type Room } from "colyseus.js";
-import { Application, Container, Graphics, Text } from "pixi.js";
+import { Application, Container, Graphics, Rectangle, Text } from "pixi.js";
 import {
   ADVENTURER_STAT_KEYS,
+  GRID_OBSTACLES,
+  GRID_SIZE,
+  ISO_TILE_HEIGHT,
+  ISO_TILE_WIDTH,
   NETWORK_MESSAGES,
-  PLAYER_RADIUS,
   RARITY_CONFIG,
   ROOM_NAME,
-  WORLD_HEIGHT,
-  WORLD_WIDTH,
   generateAdventurer,
   isWorldStateMessage,
   type AdventurerStat,
   type GeneratedAdventurer,
-  type MovementInputMessage,
+  type GridPoint,
   type PingMessage,
   type PongMessage,
   type TraitDefinition,
@@ -22,6 +23,7 @@ import {
 import "./style.css";
 
 type ConnectionStatus = "connecting" | "connected" | "disconnected" | "error";
+type SectionName = "menu" | "world" | "adventurers";
 
 const serverUrl = import.meta.env.VITE_SERVER_URL || "ws://localhost:2567";
 const connectButton = document.querySelector<HTMLButtonElement>("#connect-button")!;
@@ -30,9 +32,15 @@ const statusLabel = document.querySelector<HTMLParagraphElement>("#connection-st
 const detailLabel = document.querySelector<HTMLParagraphElement>("#connection-detail")!;
 const statusIndicator = document.querySelector<HTMLSpanElement>("#status-indicator")!;
 const serverAddress = document.querySelector<HTMLSpanElement>("#server-address")!;
+const worldServerAddress = document.querySelector<HTMLSpanElement>("#server-address-world")!;
 const roundTripTime = document.querySelector<HTMLSpanElement>("#round-trip-time")!;
 const worldRoot = document.querySelector<HTMLDivElement>("#pixi-root")!;
-const gameShell = document.querySelector<HTMLElement>(".game-shell")!;
+const sections: Record<SectionName, HTMLElement> = {
+  menu: document.querySelector<HTMLElement>("#menu-section")!,
+  world: document.querySelector<HTMLElement>("#world-section")!,
+  adventurers: document.querySelector<HTMLElement>("#adventurers-section")!
+};
+const navigationButtons = document.querySelectorAll<HTMLButtonElement>("[data-section]");
 const worldInfo = document.querySelector<HTMLDivElement>("#world-info")!;
 const playerCount = document.querySelector<HTMLSpanElement>("#player-count")!;
 const generateButton = document.querySelector<HTMLButtonElement>("#generate-button")!;
@@ -52,8 +60,9 @@ const statValues: Record<AdventurerStat, HTMLElement> = {
 
 const client = new Client(serverUrl);
 let activeRoom: Room | undefined;
-let currentInput: MovementInputMessage = { up: false, down: false, left: false, right: false };
-const heldKeys = new Set<string>();
+let worldViewPromise: Promise<WorldView> | undefined;
+let currentSection: SectionName = "menu";
+let connectionAttempt = 0;
 let status: ConnectionStatus = "disconnected";
 const statusNames: Record<ConnectionStatus, string> = {
   connecting: "Connecting",
@@ -63,6 +72,7 @@ const statusNames: Record<ConnectionStatus, string> = {
 };
 
 serverAddress.textContent = serverUrl;
+worldServerAddress.textContent = serverUrl;
 
 function displayAdventurer(adventurer: GeneratedAdventurer): void {
   adventurerName.textContent = adventurer.name;
@@ -121,14 +131,46 @@ interface PlayerVisual {
   targetY: number;
 }
 
+const MAP_WIDTH = GRID_SIZE * ISO_TILE_WIDTH;
+const MAP_HEIGHT = GRID_SIZE * ISO_TILE_HEIGHT + 32;
+const MAP_ORIGIN_Y = 24;
+const BLOCK_DEPTH = 12;
+const BLOCKED_TILES = new Set(GRID_OBSTACLES.map(({ column, row }) => `${column},${row}`));
+
+function projectGridPoint(point: Pick<GridPoint, "column" | "row">): { x: number; y: number } {
+  return {
+    x: MAP_WIDTH / 2 + (point.column - point.row) * ISO_TILE_WIDTH / 2,
+    y: MAP_ORIGIN_Y + (point.column + point.row) * ISO_TILE_HEIGHT / 2
+  };
+}
+
+function drawDiamond(graphics: Graphics, x: number, y: number, fill: number, alpha = 1): void {
+  graphics.moveTo(x, y - ISO_TILE_HEIGHT / 2)
+    .lineTo(x + ISO_TILE_WIDTH / 2, y)
+    .lineTo(x, y + ISO_TILE_HEIGHT / 2)
+    .lineTo(x - ISO_TILE_WIDTH / 2, y)
+    .closePath()
+    .fill({ color: fill, alpha })
+    .stroke({ color: "#182f26", alpha: 0.88, width: 1.15 });
+}
+
 class WorldView {
   private readonly app: Application;
   private readonly scene = new Container();
   private readonly players = new Map<string, PlayerVisual>();
+  private readonly mapLayer = new Graphics();
+  private readonly selection = new Graphics();
 
-  constructor(app: Application) {
+  constructor(app: Application, private readonly onDestination: (destination: GridPoint) => void) {
     this.app = app;
     this.drawMap();
+    this.mapLayer.zIndex = -2;
+    this.selection.zIndex = -1;
+    this.scene.addChild(this.mapLayer, this.selection);
+    this.scene.sortableChildren = true;
+    this.scene.eventMode = "static";
+    this.scene.hitArea = new Rectangle(0, 0, MAP_WIDTH, MAP_HEIGHT);
+    this.scene.on("pointerdown", (event) => this.selectTile(event.global.x, event.global.y));
     app.stage.addChild(this.scene);
     this.layout();
     app.renderer.on("resize", () => this.layout());
@@ -147,9 +189,10 @@ class WorldView {
         this.scene.addChild(visual.container);
       }
 
-      visual.targetX = player.x;
-      visual.targetY = player.y;
-      visual.container.zIndex = Math.round(player.y);
+      const position = projectGridPoint({ column: player.x, row: player.y });
+      visual.targetX = position.x;
+      visual.targetY = position.y;
+      visual.container.zIndex = Math.round(player.x + player.y);
       visual.container.label = player.id === localPlayerId ? "You" : player.name;
     }
 
@@ -159,64 +202,93 @@ class WorldView {
       visual.container.destroy({ children: true });
       this.players.delete(playerId);
     }
-
-    this.scene.sortableChildren = true;
   }
 
   private drawMap(): void {
-    const map = new Graphics();
-    map.rect(14, 14, WORLD_WIDTH - 28, WORLD_HEIGHT - 28)
-      .fill({ color: "#203d31" })
-      .stroke({ color: "#d9bb76", alpha: 0.55, width: 3 });
-
-    for (let x = 64; x < WORLD_WIDTH; x += 64) {
-      map.moveTo(x, 16).lineTo(x, WORLD_HEIGHT - 16).stroke({ color: "#b7c58d", alpha: 0.055, width: 1 });
+    for (let depth = 0; depth < GRID_SIZE * 2 - 1; depth += 1) {
+      const firstColumn = Math.max(0, depth - GRID_SIZE + 1);
+      const lastColumn = Math.min(GRID_SIZE - 1, depth);
+      for (let column = firstColumn; column <= lastColumn; column += 1) {
+        this.drawTile(column, depth - column);
+      }
     }
-    for (let y = 64; y < WORLD_HEIGHT; y += 64) {
-      map.moveTo(16, y).lineTo(WORLD_WIDTH - 16, y).stroke({ color: "#b7c58d", alpha: 0.055, width: 1 });
+  }
+
+  private drawTile(column: number, row: number): void {
+    const { x, y } = projectGridPoint({ column, row });
+    const blocked = BLOCKED_TILES.has(`${column},${row}`);
+    const top = { x, y: y - ISO_TILE_HEIGHT / 2 };
+    const right = { x: x + ISO_TILE_WIDTH / 2, y };
+    const bottom = { x, y: y + ISO_TILE_HEIGHT / 2 };
+    const left = { x: x - ISO_TILE_WIDTH / 2, y };
+
+    this.mapLayer.moveTo(left.x, left.y)
+      .lineTo(bottom.x, bottom.y)
+      .lineTo(bottom.x, bottom.y + BLOCK_DEPTH)
+      .lineTo(left.x, left.y + BLOCK_DEPTH)
+      .closePath()
+      .fill({ color: blocked ? "#554a3d" : "#294b3b" })
+      .stroke({ color: "#172d25", alpha: 0.8, width: 1 });
+    this.mapLayer.moveTo(right.x, right.y)
+      .lineTo(bottom.x, bottom.y)
+      .lineTo(bottom.x, bottom.y + BLOCK_DEPTH)
+      .lineTo(right.x, right.y + BLOCK_DEPTH)
+      .closePath()
+      .fill({ color: blocked ? "#6a5945" : "#315743" })
+      .stroke({ color: "#172d25", alpha: 0.8, width: 1 });
+    const tileColor = blocked ? 0x8a7255 : (column + row) % 2 === 0 ? 0x47795d : 0x3e7054;
+    drawDiamond(this.mapLayer, x, y, tileColor);
+    if (column === 0 || row === 0 || column === GRID_SIZE - 1 || row === GRID_SIZE - 1) {
+      this.mapLayer.moveTo(top.x, top.y)
+        .lineTo(right.x, right.y)
+        .lineTo(bottom.x, bottom.y)
+        .lineTo(left.x, left.y)
+        .closePath()
+        .stroke({ color: "#d9bb76", alpha: 0.6, width: 1.5 });
     }
-
-    map.roundRect(470, 270, 260, 210, 28)
-      .fill({ color: "#536c45" })
-      .stroke({ color: "#a9b37e", alpha: 0.48, width: 2 });
-    map.roundRect(500, 305, 200, 140, 10)
-      .fill({ color: "#6b5940" })
-      .stroke({ color: "#d4b777", alpha: 0.8, width: 2 });
-    map.rect(574, 365, 52, 80).fill({ color: "#362f28" });
-    map.moveTo(460, 375).lineTo(190, 375).lineTo(190, 210).stroke({ color: "#b29d6b", alpha: 0.55, width: 26 });
-    map.moveTo(740, 375).lineTo(1010, 375).lineTo(1010, 590).stroke({ color: "#b29d6b", alpha: 0.55, width: 26 });
-
-    for (const [x, y] of [[150, 150], [1040, 160], [112, 650], [1090, 660], [850, 120], [350, 650]] as const) {
-      map.circle(x, y, 26).fill({ color: "#294d3a" }).stroke({ color: "#71906a", alpha: 0.65, width: 2 });
-      map.circle(x, y, 12).fill({ color: "#54734d" });
-    }
-
-    this.scene.addChild(map);
   }
 
   private createPlayer(player: WorldPlayer): PlayerVisual {
     const container = new Container();
     const character = new Graphics();
-    character.circle(0, 0, PLAYER_RADIUS).fill({ color: player.color })
+    character.ellipse(0, 0, 12, 7).fill({ color: player.color })
       .stroke({ color: "#f2eddc", alpha: 0.9, width: 2 });
-    character.circle(0, -PLAYER_RADIUS - 2, 5).fill({ color: "#f2eddc" });
+    character.circle(0, -10, 5).fill({ color: "#f2eddc" });
     const name = new Text({
       text: player.name,
       style: { fill: "#f2eddc", fontFamily: "DM Sans, sans-serif", fontSize: 11, fontWeight: "600" }
     });
     name.anchor.set(0.5, 0);
-    name.position.set(0, PLAYER_RADIUS + 5);
+    name.position.set(0, 8);
     container.addChild(character, name);
-    container.position.set(player.x, player.y);
-    return { container, targetX: player.x, targetY: player.y };
+    const position = projectGridPoint({ column: player.x, row: player.y });
+    container.position.set(position.x, position.y);
+    return { container, targetX: position.x, targetY: position.y };
+  }
+
+  private selectTile(screenX: number, screenY: number): void {
+    const local = this.scene.toLocal({ x: screenX, y: screenY });
+    const deltaX = local.x - MAP_WIDTH / 2;
+    const deltaY = local.y - MAP_ORIGIN_Y;
+    const destination = {
+      column: Math.round(deltaX / ISO_TILE_WIDTH + deltaY / ISO_TILE_HEIGHT),
+      row: Math.round(deltaY / ISO_TILE_HEIGHT - deltaX / ISO_TILE_WIDTH)
+    };
+    if (destination.column < 0 || destination.column >= GRID_SIZE || destination.row < 0 || destination.row >= GRID_SIZE) return;
+    if (BLOCKED_TILES.has(`${destination.column},${destination.row}`)) return;
+
+    this.selection.clear();
+    const { x, y } = projectGridPoint(destination);
+    drawDiamond(this.selection, x, y, 0xf0cc73, 0.42);
+    this.onDestination(destination);
   }
 
   private layout(): void {
-    const scale = Math.min(this.app.screen.width / WORLD_WIDTH, this.app.screen.height / WORLD_HEIGHT);
+    const scale = Math.min(this.app.screen.width / MAP_WIDTH, this.app.screen.height / MAP_HEIGHT);
     this.scene.scale.set(scale);
     this.scene.position.set(
-      (this.app.screen.width - WORLD_WIDTH * scale) / 2,
-      (this.app.screen.height - WORLD_HEIGHT * scale) / 2
+      (this.app.screen.width - MAP_WIDTH * scale) / 2,
+      (this.app.screen.height - MAP_HEIGHT * scale) / 2
     );
   }
 
@@ -245,36 +317,76 @@ function setStatus(nextStatus: ConnectionStatus, detail: string): void {
 
 function resetWorld(view: WorldView): void {
   view.setWorldState({ players: [] });
-  currentInput = { up: false, down: false, left: false, right: false };
-  heldKeys.clear();
   playerCount.textContent = "0 players";
   worldInfo.hidden = true;
-  gameShell.classList.remove("is-connected");
+}
+
+async function ensureWorldView(): Promise<WorldView> {
+  if (!worldViewPromise) worldViewPromise = createWorldView();
+  return worldViewPromise;
+}
+
+async function leaveWorld(): Promise<void> {
+  connectionAttempt += 1;
+  const room = activeRoom;
+  activeRoom = undefined;
+  let leaveError: unknown;
+  try {
+    if (room) await room.leave();
+  } catch (error) {
+    leaveError = error;
+  }
+  if (worldViewPromise) resetWorld(await worldViewPromise);
+  setStatus(leaveError ? "error" : "disconnected", leaveError instanceof Error ? leaveError.message : "Connection closed");
+  roundTripTime.textContent = leaveError ? "LINK FAILED" : "NETWORK STANDBY";
+}
+
+async function showSection(section: SectionName): Promise<void> {
+  if (currentSection === "world" && section !== "world") await leaveWorld();
+  currentSection = section;
+
+  for (const [name, element] of Object.entries(sections) as [SectionName, HTMLElement][]) {
+    element.hidden = name !== section;
+  }
+  navigationButtons.forEach((button) => {
+    if (button.dataset.section === section) button.setAttribute("aria-current", "page");
+    else button.removeAttribute("aria-current");
+  });
+  worldRoot.setAttribute("aria-hidden", String(section !== "world"));
+
+  if (section === "world") {
+    try {
+      await ensureWorldView();
+    } catch (error) {
+      setStatus("error", error instanceof Error ? error.message : "Unable to initialize the world");
+    }
+  }
 }
 
 async function connectToServer(): Promise<void> {
   if (status === "connecting") return;
 
-  if (status === "connected" && activeRoom) {
-    const room = activeRoom;
-    activeRoom = undefined;
-    await room.leave();
-    resetWorld(await worldViewPromise);
-    setStatus("disconnected", "Connection closed");
-    roundTripTime.textContent = "NETWORK STANDBY";
+  if (status === "connected") {
+    await leaveWorld();
     return;
   }
 
+  const attempt = ++connectionAttempt;
   setStatus("connecting", "Opening a session with the game server");
   roundTripTime.textContent = "ESTABLISHING LINK";
 
   try {
     const room = await client.joinOrCreate(ROOM_NAME);
-    const worldView = await worldViewPromise;
+    if (attempt !== connectionAttempt || currentSection !== "world") {
+      await room.leave();
+      return;
+    }
+    const worldView = await ensureWorldView();
+    if (attempt !== connectionAttempt || currentSection !== "world") {
+      await room.leave();
+      return;
+    }
     activeRoom = room;
-    currentInput = { up: false, down: false, left: false, right: false };
-    heldKeys.clear();
-    gameShell.classList.add("is-connected");
     worldInfo.hidden = false;
     setStatus("connected", `Room ${room.roomId} · checking server response`);
 
@@ -308,52 +420,21 @@ async function connectToServer(): Promise<void> {
     const ping: PingMessage = { sentAt: Date.now() };
     room.send(NETWORK_MESSAGES.ping, ping);
   } catch (error) {
+    if (attempt !== connectionAttempt) return;
     activeRoom = undefined;
-    gameShell.classList.remove("is-connected");
     worldInfo.hidden = true;
     setStatus("error", error instanceof Error ? error.message : "Unable to connect to the game server");
     roundTripTime.textContent = "LINK FAILED";
   }
 }
 
-function releaseMovement(): void {
-  heldKeys.clear();
-  sendMovementInput();
-}
-
-function sendMovementInput(): void {
-  const nextInput: MovementInputMessage = {
-    up: heldKeys.has("w") || heldKeys.has("arrowup"),
-    down: heldKeys.has("s") || heldKeys.has("arrowdown"),
-    left: heldKeys.has("a") || heldKeys.has("arrowleft"),
-    right: heldKeys.has("d") || heldKeys.has("arrowright")
-  };
-  if (Object.keys(nextInput).every((key) => nextInput[key as keyof MovementInputMessage] === currentInput[key as keyof MovementInputMessage])) {
-    return;
-  }
-
-  currentInput = nextInput;
-  activeRoom?.send(NETWORK_MESSAGES.movement, nextInput);
-}
-
-window.addEventListener("keydown", (event) => {
-  if (!activeRoom) return;
-  const key = event.key.toLowerCase();
-  if (!["w", "a", "s", "d", "arrowup", "arrowdown", "arrowleft", "arrowright"].includes(key)) return;
-  event.preventDefault();
-  heldKeys.add(key);
-  sendMovementInput();
-});
-
-window.addEventListener("keyup", (event) => {
-  const key = event.key.toLowerCase();
-  if (!heldKeys.delete(key)) return;
-  sendMovementInput();
-});
-
-window.addEventListener("blur", releaseMovement);
-
 connectButton.addEventListener("click", () => void connectToServer());
+navigationButtons.forEach((button) => {
+  button.addEventListener("click", () => {
+    const section = button.dataset.section as SectionName | undefined;
+    if (section && section in sections) void showSection(section);
+  });
+});
 
 async function createWorldView(): Promise<WorldView> {
   const app = new Application();
@@ -364,8 +445,12 @@ async function createWorldView(): Promise<WorldView> {
     resolution: window.devicePixelRatio || 1,
     autoDensity: true
   });
+  app.canvas.style.touchAction = "none";
+  app.canvas.style.cursor = "crosshair";
   worldRoot.appendChild(app.canvas);
-  return new WorldView(app);
+  return new WorldView(app, (destination) => {
+    activeRoom?.send(NETWORK_MESSAGES.destination, destination);
+  });
 }
 
-const worldViewPromise = createWorldView();
+void showSection("menu");

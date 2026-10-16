@@ -1,3 +1,5 @@
+import type { GridPoint } from "./grid.js";
+
 export const ROOM_NAME = "connection";
 
 export const WORLD_WIDTH = 1200;
@@ -7,7 +9,7 @@ export const PLAYER_RADIUS = 16;
 export const NETWORK_MESSAGES = {
   ping: "ping",
   pong: "pong",
-  movement: "movement",
+  destination: "world:destination",
   worldSync: "world:sync",
   worldState: "world:state"
 } as const;
@@ -21,12 +23,7 @@ export interface PongMessage {
   serverTime: number;
 }
 
-export interface MovementInputMessage {
-  up: boolean;
-  down: boolean;
-  left: boolean;
-  right: boolean;
-}
+export interface WorldDestinationMessage extends GridPoint {}
 
 export interface WorldPlayer {
   id: string;
@@ -50,14 +47,12 @@ export function isPingMessage(value: unknown): value is PingMessage {
   );
 }
 
-export function isMovementInputMessage(value: unknown): value is MovementInputMessage {
+export function isWorldDestinationMessage(value: unknown): value is WorldDestinationMessage {
   return (
     typeof value === "object" &&
     value !== null &&
-    "up" in value && typeof value.up === "boolean" &&
-    "down" in value && typeof value.down === "boolean" &&
-    "left" in value && typeof value.left === "boolean" &&
-    "right" in value && typeof value.right === "boolean"
+    "column" in value && typeof value.column === "number" && Number.isInteger(value.column) &&
+    "row" in value && typeof value.row === "number" && Number.isInteger(value.row)
   );
 }
 

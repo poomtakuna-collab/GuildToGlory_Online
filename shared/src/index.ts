@@ -1,4 +1,5 @@
 export * from "./messages.js";
+export * from "./grid.js";
 export * from "./adventurer.js";
 export * from "./skills.js";
 export * from "./traitRegistry.js";

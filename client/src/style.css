@@ -651,3 +651,315 @@ h1 span {
     transition-duration: 0.01ms !important;
   }
 }
+
+[hidden] {
+  display: none !important;
+}
+
+.game-shell {
+  min-height: 100svh;
+  overflow-x: hidden;
+  overflow-y: auto;
+  grid-template-rows: auto 1fr auto;
+}
+
+.topbar {
+  position: relative;
+  z-index: 2;
+  justify-content: flex-start;
+  gap: clamp(16px, 3vw, 42px);
+}
+
+.wordmark {
+  flex: 0 0 auto;
+  padding: 0;
+  border: 0;
+  background: transparent;
+  cursor: pointer;
+}
+
+.section-nav {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  margin-left: auto;
+}
+
+.section-nav button,
+.secondary-button {
+  min-height: 38px;
+  padding: 0 13px;
+  border: 1px solid transparent;
+  border-radius: 2px;
+  background: transparent;
+  color: #c2c9bc;
+  cursor: pointer;
+  font-size: 11px;
+  font-weight: 600;
+  transition: border-color 160ms ease, color 160ms ease, background 160ms ease;
+}
+
+.section-nav button:hover,
+.section-nav button[aria-current="page"],
+.secondary-button:hover {
+  border-color: var(--line);
+  color: var(--gold);
+}
+
+.page-section {
+  min-width: 0;
+  animation: arrive 350ms ease-out both;
+}
+
+.menu-section {
+  display: grid;
+  min-height: 520px;
+  place-items: center;
+  padding: 32px 20px;
+}
+
+.start-panel {
+  width: min(100%, 590px);
+  margin: 0;
+  padding-block: 45px;
+}
+
+.menu-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin-top: 32px;
+}
+
+.menu-actions .connect-button,
+.menu-actions .secondary-button {
+  min-height: 48px;
+  margin: 0;
+}
+
+.menu-actions .secondary-button {
+  border-color: var(--line);
+  padding-inline: 20px;
+}
+
+.menu-section .server-address {
+  margin-top: 30px;
+}
+
+.section-heading {
+  display: flex;
+  min-width: 0;
+  align-items: center;
+  justify-content: space-between;
+  gap: 20px;
+}
+
+.section-heading h1 {
+  font-size: clamp(30px, 4vw, 46px);
+}
+
+.world-section {
+  display: grid;
+  min-height: 0;
+  grid-template-rows: auto minmax(280px, 1fr) auto;
+  gap: 18px;
+  padding: 24px clamp(20px, 5vw, 76px) 26px;
+}
+
+.world-heading .eyebrow,
+.adventurers-section > .section-heading .eyebrow {
+  margin-bottom: 8px;
+}
+
+.world-info {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 18px;
+  margin: 0;
+  color: #c2c9bc;
+  font-size: 11px;
+}
+
+.world-info span:first-child {
+  color: var(--gold);
+}
+
+.world-stage {
+  position: relative;
+  min-width: 0;
+  min-height: 280px;
+  height: min(58svh, 720px);
+  overflow: hidden;
+  border: 1px solid var(--line);
+  background: #172c24;
+}
+
+.world,
+.world-shade {
+  position: absolute;
+  z-index: 0;
+  inset: 0;
+}
+
+.world canvas {
+  display: block;
+  width: 100%;
+  height: 100%;
+}
+
+.world-shade {
+  background:
+    linear-gradient(90deg, rgb(10 17 16 / 12%) 0%, transparent 55%),
+    repeating-linear-gradient(0deg, transparent 0 5px, rgb(239 233 217 / 1.3%) 6px);
+  pointer-events: none;
+}
+
+.world-controls {
+  display: flex;
+  min-width: 0;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 14px 24px;
+  padding-top: 14px;
+  border-top: 1px solid var(--line);
+}
+
+.world-controls .connection {
+  min-width: min(100%, 300px);
+  flex: 1 1 320px;
+  align-items: center;
+  padding: 0;
+  border: 0;
+}
+
+.connection-copy {
+  min-width: 0;
+}
+
+.world-controls .connect-button {
+  min-height: 42px;
+  margin: 0;
+}
+
+.world-controls .server-address {
+  max-width: 100%;
+  margin: 0;
+}
+
+.adventurers-section {
+  width: min(100%, 1080px);
+  min-height: 0;
+  margin-inline: auto;
+  padding: 30px clamp(20px, 5vw, 64px) 42px;
+}
+
+.adventurers-section .generator {
+  margin-top: 22px;
+  padding-top: 18px;
+}
+
+.adventurers-section .generator-heading > div {
+  display: flex;
+  align-items: baseline;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+
+.adventurers-section .generator-kicker {
+  margin: 0;
+}
+
+.adventurers-section .adventurer-details {
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+}
+
+.bottom-bar {
+  position: relative;
+  z-index: 2;
+  gap: 16px;
+}
+
+@media (max-width: 760px) {
+  .topbar {
+    min-height: 72px;
+    flex-wrap: wrap;
+    gap: 10px 16px;
+    padding-block: 12px;
+  }
+
+  .section-nav {
+    order: 3;
+    width: 100%;
+    justify-content: center;
+    margin-left: 0;
+  }
+
+  .edition {
+    margin-left: auto;
+  }
+
+  .world-section {
+    padding-inline: 16px;
+  }
+
+  .world-controls .server-address {
+    flex-basis: 100%;
+  }
+}
+
+@media (max-width: 520px) {
+  .menu-section {
+    min-height: 440px;
+    padding-inline: 16px;
+  }
+
+  .start-panel {
+    padding-block: 24px;
+  }
+
+  .start-panel h1 {
+    font-size: 39px;
+  }
+
+  .section-nav button {
+    padding-inline: 9px;
+    font-size: 10px;
+  }
+
+  .edition {
+    font-size: 7px;
+  }
+
+  .world-section {
+    grid-template-rows: auto minmax(240px, 1fr) auto;
+    padding-inline: 12px;
+  }
+
+  .world-stage {
+    min-height: 240px;
+    height: 48svh;
+  }
+
+  .world-heading {
+    align-items: flex-end;
+  }
+
+  .world-heading .world-info {
+    flex-direction: column;
+    gap: 5px;
+  }
+
+  .adventurers-section .adventurer-details {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .stat-grid {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+
+  .bottom-bar {
+    flex-wrap: wrap;
+    justify-content: center;
+    padding-block: 12px;
+  }
+}

@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { isMovementInputMessage, isPingMessage, isWorldStateMessage } from "../src/messages.js";
+import { isPingMessage, isWorldDestinationMessage, isWorldStateMessage } from "../src/messages.js";
 
 describe("isPingMessage", () => {
   it("accepts a finite client timestamp", () => {
@@ -14,14 +14,14 @@ describe("isPingMessage", () => {
   );
 });
 
-describe("isMovementInputMessage", () => {
-  it("accepts directional booleans", () => {
-    expect(isMovementInputMessage({ up: false, down: true, left: false, right: false })).toBe(true);
+describe("isWorldDestinationMessage", () => {
+  it("accepts integer grid coordinates", () => {
+    expect(isWorldDestinationMessage({ column: 4, row: 7 })).toBe(true);
   });
 
-  it("rejects incomplete or non-boolean input", () => {
-    expect(isMovementInputMessage({ up: true, down: false, left: false })).toBe(false);
-    expect(isMovementInputMessage({ up: 1, down: false, left: false, right: false })).toBe(false);
+  it("rejects incomplete or fractional coordinates", () => {
+    expect(isWorldDestinationMessage({ column: 4 })).toBe(false);
+    expect(isWorldDestinationMessage({ column: 4.5, row: 7 })).toBe(false);
   });
 });
 
