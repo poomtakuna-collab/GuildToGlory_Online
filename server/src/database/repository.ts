@@ -1,5 +1,5 @@
 import { randomUUID } from "node:crypto";
-import { parseGuild, validateGuildName, type ActiveParty, type RosterAdventurer } from "@guild-to-glory/shared";
+import { parseGuild, validateGuildName, type GuildData, type ActiveParty, type RosterAdventurer } from "@guild-to-glory/shared";
 import { GuildDatabase } from "./database.js";
 
 export interface PlayerRecord { id: string; created_at: string; updated_at: string }
@@ -7,7 +7,7 @@ export interface GuildRecord {
   id: string; owner_player_id: string; name: string; level: number; gold: number;
   created_at: string; updated_at: string;
 }
-export interface CreateGuildInput { id?: string; ownerPlayerId: string; name: string; level: number; gold: number }
+export interface CreateGuildInput { id?: string; ownerPlayerId: string; name: string; level: number; gold: number; createdAt?: string }
 function id(value: string): void { if(typeof value!=="string" || !value.trim()) throw Error("Invalid ID."); }
 function number(value: number, min: number): void { if(!Number.isSafeInteger(value) || value<min) throw Error("Invalid level or gold."); }
 /** Reuse current generated-character validation without generating characters or granting gold.
@@ -37,7 +37,7 @@ export class GuildRepository {
     const guildId=input.id??randomUUID();id(guildId);id(input.ownerPlayerId);
     const name=validateGuildName(input.name);number(input.level,1);number(input.gold,0);
     return this.database.transaction(()=>{
-      const now=new Date().toISOString();
+      const now=input.createdAt??new Date().toISOString();
       this.db.prepare("INSERT INTO guilds(id,owner_player_id,name,level,gold,created_at,updated_at) VALUES (?,?,?,?,?,?,?)")
         .run(guildId,input.ownerPlayerId,name,input.level,input.gold,now,now);
       this.db.prepare("INSERT INTO active_parties(guild_id,leader_adventurer_id) VALUES (?,NULL)").run(guildId);
@@ -126,6 +126,39 @@ export class GuildRepository {
       party.memberIds.forEach((member,index)=>this.db.prepare("INSERT INTO active_party_members(guild_id,adventurer_id,slot_index) VALUES (?,?,?)").run(guildId,member,index));
       this.db.prepare("UPDATE active_parties SET leader_adventurer_id=? WHERE guild_id=?").run(party.leaderId,guildId);
     });
+  }
+  loadGuildForPlayer(playerId:string):GuildData|null {
+    const row=this.findGuildByPlayer(playerId);if(!row)return null;
+    return parseGuild({schemaVersion:3,id:row.id,name:row.name,level:row.level,gold:row.gold,createdAt:row.created_at,
+      roster:this.loadRoster(row.id),pendingRecruit:this.loadPendingRecruit(row.id),activeParty:this.loadActiveParty(row.id)});
+  }
+  saveGuildSnapshot(playerId:string,value:GuildData):void {
+    const guild=parseGuild(value);
+    this.database.transaction(()=>{
+      const existing=this.findGuildByPlayer(playerId);
+      if(existing && existing.id!==guild.id)throw Error("Guild identity cannot change.");
+      // Pending IDs also participate in cross-Guild uniqueness checks.
+      const ids=[...guild.roster.map(a=>a.id),...(guild.pendingRecruit?[guild.pendingRecruit.id]:[])];
+      for(const id of ids) {
+        if(this.db.prepare("SELECT id FROM adventurers WHERE id=? AND guild_id<>?").get(id,guild.id) ||
+          this.db.prepare("SELECT guild_id FROM pending_recruits WHERE json_extract(adventurer_data,'$.id')=? AND guild_id<>?").get(id,guild.id))throw Error("Adventurer ID already exists.");
+      }
+      if(!existing)this.createGuild({id:guild.id,ownerPlayerId:playerId,name:guild.name,level:guild.level,gold:guild.gold,createdAt:guild.createdAt});
+      else this.updateGuild(guild.id,{name:guild.name,level:guild.level,gold:guild.gold});
+      this.clearPendingRecruit(guild.id);this.saveRoster(guild.id,guild.roster);
+      if(guild.pendingRecruit)this.savePendingRecruit(guild.id,guild.pendingRecruit);
+      this.saveActiveParty(guild.id,guild.activeParty);
+    });
+  }
+  revision(playerId:string):number { return (this.db.prepare("SELECT revision FROM guild_revisions WHERE player_id=?").get(playerId)?.revision as number|undefined)??0; }
+  advanceRevision(playerId:string):void {
+    this.db.prepare("INSERT INTO guild_revisions(player_id,revision) VALUES (?,1) ON CONFLICT(player_id) DO UPDATE SET revision=revision+1").run(playerId);
+  }
+  commandReceipt(playerId:string,requestId:string):{fingerprint:string;outcome:string}|null {
+    return this.db.prepare("SELECT fingerprint,outcome FROM guild_commands WHERE player_id=? AND request_id=?").get(playerId,requestId) as {fingerprint:string;outcome:string}|undefined ?? null;
+  }
+  saveCommandReceipt(playerId:string,requestId:string,fingerprint:string,outcome:unknown):void {
+    this.db.prepare("INSERT INTO guild_commands VALUES (?,?,?,?,?)").run(playerId,requestId,fingerprint,JSON.stringify(outcome),new Date().toISOString());
   }
   loadActiveParty(guildId: string): ActiveParty {
     this.requireGuild(guildId);

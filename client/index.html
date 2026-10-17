@@ -45,6 +45,7 @@
             <h1 id="world-title">Guild Hall</h1>
           </div>
           <div id="world-info" class="world-info" hidden>
+            <span id="guest-player-id"></span>
             <span id="player-count">0 players</span>
             <span>Click a tile to move</span>
           </div>
@@ -52,6 +53,7 @@
 
         <section class="world-party-panel" aria-labelledby="world-party-title">
           <h2 id="world-party-title">Session Guilds &amp; Parties</h2>
+          <p>Session display snapshots only. Guild management uses the server database.</p>
           <button id="sync-party" class="secondary-button" type="button">Sync Current Party</button>
           <p id="party-sync-status" role="status" aria-live="polite"></p>
           <ul id="world-party-summary"></ul>
@@ -173,6 +175,14 @@
         <div class="section-heading"><div><p class="eyebrow">Your Guild</p><h1 id="guild-title">Guild</h1></div>
           <button class="secondary-button" type="button" data-section="menu">Main Menu</button></div>
         <p data-guild-status role="status" aria-live="polite"></p>
+        <button type="button" class="secondary-button" data-guild-retry>Refresh / Retry</button>
+        <section data-legacy-import hidden>
+          <h2>Legacy Guild Import (Development only)</h2>
+          <p>Preview the browser Guild before importing. The original is kept unchanged.</p>
+          <button type="button" class="secondary-button" data-legacy-preview>Preview Legacy Guild</button>
+          <pre data-legacy-data style="max-height: 320px; overflow: auto; white-space: pre-wrap"></pre>
+          <button type="button" class="secondary-button" data-legacy-confirm disabled>Confirm Import</button>
+        </section>
         <form class="guild-create">
           <h2>Create Guild</h2>
           <p>Begin at Level 1 with 40,000 G and 8 empty roster slots.</p>
@@ -183,6 +193,7 @@
         </form>
         <div data-guild-details hidden>
           <h2 data-guild-name></h2>
+          <section data-server-debug hidden><h3>Developer Debug (Server)</h3><button type="button" class="secondary-button" data-debug-gold>+100,000 G</button></section>
           <dl class="guild-summary"><div><dt>Level</dt><dd data-guild-level></dd></div><div><dt>Gold</dt><dd data-guild-gold></dd></div><div><dt>Adventurer Roster</dt><dd data-guild-roster></dd></div></dl>
           <section class="guild-party" aria-labelledby="party-title">
             <h2 id="party-title">Active Party <span data-party-count></span></h2>
@@ -201,7 +212,7 @@
             <div data-member hidden></div>
           </section>
         </div>
-        <p class="guild-storage-note">Guild progress is saved in this browser profile. Keep browser site data to retain your Guild.</p>
+        <p class="guild-storage-note">Guild progress is saved on the server for your Guest Account. Keep your browser credential to retain access.</p>
       </section>
 
       <section id="adventurers-section" class="page-section adventurers-section" aria-labelledby="adventurers-title" hidden>

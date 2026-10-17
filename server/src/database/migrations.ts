@@ -53,7 +53,23 @@ CREATE TRIGGER clear_removed_leader BEFORE DELETE ON active_party_members
 BEGIN
   UPDATE active_parties SET leader_adventurer_id = NULL
     WHERE guild_id = OLD.guild_id AND leader_adventurer_id = OLD.adventurer_id;
-END;`}];
+END;`}, {version:2,name:"guest_credentials",sql:`
+CREATE TABLE guest_credentials (
+  player_id TEXT PRIMARY KEY NOT NULL REFERENCES players(id),
+  credential_hash TEXT NOT NULL UNIQUE CHECK(length(credential_hash)=64),
+  created_at TEXT NOT NULL
+) STRICT;
+`}, {version:3,name:"guild_commands",sql:`
+CREATE TABLE guild_revisions (
+ player_id TEXT PRIMARY KEY NOT NULL REFERENCES players(id),
+ revision INTEGER NOT NULL CHECK(revision>=0)
+) STRICT;
+CREATE TABLE guild_commands (
+ player_id TEXT NOT NULL REFERENCES players(id), request_id TEXT NOT NULL,
+ fingerprint TEXT NOT NULL, outcome TEXT NOT NULL CHECK(json_valid(outcome)), created_at TEXT NOT NULL,
+ PRIMARY KEY(player_id,request_id)
+) STRICT;
+`}];
 
 /** All pending migrations and their version records commit together. Never reset data. */
 export function migrate(db: DatabaseSync, migrations: readonly Migration[] = MIGRATIONS): void {

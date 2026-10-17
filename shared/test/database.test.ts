@@ -22,11 +22,11 @@ function guild(repo:GuildRepository,name="Guild Alpha"){
 }
 afterEach(()=>{for(const db of databases.splice(0))db.close();for(const path of directories.splice(0))rmSync(path,{recursive:true,force:true});});
 describe("SQLite foundation",()=>{
-  it("initializes schema version 1 with foreign keys, WAL and no seeded accounts or gold",()=>{
+  it("initializes schema version 3 with foreign keys, WAL and no seeded accounts or gold",()=>{
     const {db}=fixture();
     expect(db.connection.prepare("PRAGMA foreign_keys").get()!.foreign_keys).toBe(1);
     expect(db.connection.prepare("PRAGMA journal_mode").get()!.journal_mode).toBe("wal");
-    expect(db.connection.prepare("SELECT version,name FROM schema_migrations").all()).toEqual([{version:1,name:"guild_foundation"}]);
+    expect(db.connection.prepare("SELECT version,name FROM schema_migrations").all()).toEqual([{version:1,name:"guild_foundation"},{version:2,name:"guest_credentials"},{version:3,name:"guild_commands"}]);
     for(const table of ["players","guilds","adventurers","pending_recruits","active_parties","active_party_members"])
       expect(db.connection.prepare("SELECT count(*) AS count FROM "+table).get()!.count).toBe(0);
   });
@@ -44,15 +44,15 @@ describe("SQLite foundation",()=>{
     const restarted=new GuildDatabase(path);databases.push(restarted);const r=new GuildRepository(restarted);
     expect(r.findPlayer(g.owner_player_id)).not.toBeNull();expect(r.findGuild(g.id)).toEqual(g);
     expect(r.loadRoster(g.id)).toEqual(roster);expect(r.loadPendingRecruit(g.id)).toEqual(pending);expect(r.loadActiveParty(g.id)).toEqual(party);
-    expect(restarted.connection.prepare("SELECT count(*) AS count FROM schema_migrations").get()!.count).toBe(1);
+    expect(restarted.connection.prepare("SELECT count(*) AS count FROM schema_migrations").get()!.count).toBe(3);
   });
   it("applies a later migration once and rolls back a failed migration and version record",()=>{
     const {db,repo}=fixture();const g=guild(repo);
-    const v2={version:2,name:"test_extension",sql:"CREATE TABLE extension(value TEXT) STRICT;"};
+    const v2={version:4,name:"test_extension",sql:"CREATE TABLE extension(value TEXT) STRICT;"};
     migrate(db.connection,[...MIGRATIONS,v2]);migrate(db.connection,[...MIGRATIONS,v2]);
-    expect(()=>migrate(db.connection,[...MIGRATIONS,v2,{version:3,name:"broken",sql:"CREATE TABLE partial(id TEXT); INVALID SQL;"}])).toThrow();
+    expect(()=>migrate(db.connection,[...MIGRATIONS,v2,{version:5,name:"broken",sql:"CREATE TABLE partial(id TEXT); INVALID SQL;"}])).toThrow();
     expect(db.connection.prepare("SELECT name FROM sqlite_master WHERE name='partial'").get()).toBeUndefined();
-    expect(db.connection.prepare("SELECT max(version) AS version FROM schema_migrations").get()!.version).toBe(2);
+    expect(db.connection.prepare("SELECT max(version) AS version FROM schema_migrations").get()!.version).toBe(4);
     expect(repo.findGuild(g.id)).toEqual(g);
   });
   it("refuses unknown migration history without overwriting existing data",()=>{

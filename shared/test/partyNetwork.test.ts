@@ -29,21 +29,21 @@ describe("Local profile and connection synchronization",()=>{
     expect(()=>getOrCreateLocalProfile(store)).toThrow();expect(store.getItem(LOCAL_PROFILE_STORAGE_KEY)).toBe("bad");
     expect(()=>getOrCreateLocalProfile({getItem:()=>null,setItem:()=>{throw Error("denied");}})).toThrow("denied");
   });
-  it("sends latest persisted data on sync/reconnect, stops old connection, and excludes private data",()=>{
+  it("sends latest persisted data on sync/reconnect, stops old connection, and excludes private data",async()=>{
     const store=storage();const g=guild();store.setItem(GUILD_STORAGE_KEY,JSON.stringify(g));
     const repo=createGuildRepository(()=>store);const id=getOrCreateLocalProfile(store);const send=vi.fn();const report=vi.fn();
-    const sync=createPartySync({send},repo,id,report);sync.sync();
+    const sync=createPartySync({send},repo,id,report);await sync.sync();
     expect(send.mock.calls[0]![1]).toEqual(createPartySnapshot(g,id,1));
-    g.activeParty={memberIds:[],leaderId:null};store.setItem(GUILD_STORAGE_KEY,JSON.stringify(g));sync.sync();
+    g.activeParty={memberIds:[],leaderId:null};store.setItem(GUILD_STORAGE_KEY,JSON.stringify(g));await sync.sync();
     expect(send.mock.calls[1]![1]).toEqual(createPartySnapshot(g,id,2));
-    sync.stop();sync.sync();expect(send).toHaveBeenCalledTimes(2);
-    createPartySync({send},repo,id,report).sync();expect(send.mock.calls[2]![1]).toEqual(createPartySnapshot(g,id,1));
+    sync.stop();await sync.sync();expect(send).toHaveBeenCalledTimes(2);
+    await createPartySync({send},repo,id,report).sync();expect(send.mock.calls[2]![1]).toEqual(createPartySnapshot(g,id,1));
     const serialized=JSON.stringify(send.mock.calls);for(const privateKey of ["gold","pendingRecruit","baseStats","traits","startingSkills"])expect(serialized).not.toContain(privateKey);
   });
-  it("reports corrupt Guild without sending fake data; absent Guild sends empty state",()=>{
+  it("reports corrupt Guild without sending fake data; absent Guild sends empty state",async()=>{
     const store=storage();const send=vi.fn();const report=vi.fn();const sync=createPartySync({send},createGuildRepository(()=>store),crypto.randomUUID(),report);
-    store.setItem(GUILD_STORAGE_KEY,"corrupt");sync.sync();expect(send).not.toHaveBeenCalled();expect(report).toHaveBeenCalledWith(expect.stringContaining("Party sync failed"));
-    store.values.delete(GUILD_STORAGE_KEY);sync.sync();expect(send.mock.calls[0]![1]).toMatchObject({guildId:null,guildName:null,memberIds:[],leaderId:null});
+    store.setItem(GUILD_STORAGE_KEY,"corrupt");await sync.sync();expect(send).not.toHaveBeenCalled();expect(report).toHaveBeenCalledWith(expect.stringContaining("Party sync failed"));
+    store.values.delete(GUILD_STORAGE_KEY);await sync.sync();expect(send.mock.calls[0]![1]).toMatchObject({guildId:null,guildName:null,memberIds:[],leaderId:null});
   });
 });
 describe("Party contract and session isolation",()=>{

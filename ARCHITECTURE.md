@@ -147,3 +147,43 @@ A server-only environment setting controls the database location. Vite denies SQ
 files in development and startup rejects paths within client assets. No database
 module is exported by shared code or imported in the client bundle. This foundation
 has no guest authentication or automatic migration/import from browser profiles.
+
+## Implemented M5.3.2B Guest Authentication
+
+Migration 2 adds guest_credentials (player FK, unique SHA-256 hash, creation time).
+Guests creates Player plus credential hash atomically with Node cryptographic RNG.
+The HTTP /guest-account endpoint returns the secret once, with bounded input,
+origin policy, no-store and per-IP/global creation limits. It seeds no Guild data.
+
+Server startup injects Guests into an authenticated ConnectionRoom subclass through
+a closure, never client options. Static Colyseus onAuth validates the Authorization
+header before admission and returns only playerId into client.auth. Party snapshots
+remain untrusted local display claims; they cannot set authenticated player identity.
+Private guest:identity on world sync supports checking the authenticated account.
+
+The client initializes before World matchmaking, serializes same-origin first use
+with Web Locks, preserves credentials on errors, and authenticates every new session.
+Guild UI/storage and current economy remain local and unchanged. No later Guild
+migration, authentication recovery, movement or combat behavior is introduced.
+
+## Implemented M5.3.2C1 Authoritative Guild Management
+
+GuildService is a business layer between the HTTP adapter and GuildRepository. The
+HTTP adapter authenticates every request with Guests and provides only verified
+playerId to the service. Shared guildApi.ts strictly validates command allowlists.
+Recruitment and Party reuse existing transitions; generation executes on the server.
+Repository aggregate snapshot reads/writes keep references and metadata consistent.
+
+Migration 3 stores account-scoped revisions and durable command receipts. Commands
+use a transaction plus nested savepoints, fingerprint-based idempotency and revision
+checks; outcomes commit with changes, including gold/pending and dismissal/party.
+Read responses and duplicate outcomes include latest state. Stale commands cannot
+silently overwrite another tab's changes. No World-session exclusivity is imposed.
+
+Client Guild UI depends on an async API adapter, retains server-confirmed data on
+errors and persists unresolved request envelopes in sessionStorage for safe retries.
+Legacy localStorage is read only after explicit Preview, and import requires a
+confirmation plus server development/opt-in gates. Debug gold is also server-gated.
+Guild creation is separate from import; no automatic browser migration occurs.
+World movement/room state is unchanged. Session display Party snapshots are never
+passed into the persistence service; C2 session takeover remains out of scope.

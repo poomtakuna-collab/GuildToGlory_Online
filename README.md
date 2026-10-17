@@ -362,3 +362,133 @@ migration failure, reopen persistence, two owners, serialization, FK/slot/leader
 constraints, multi-table rollback and write errors, alongside existing regressions.
 No authentication, browser import, cross-device sync, gameplay integration, backup
 service or later milestone is included.
+
+## M5.3.2B Guest Accounts
+
+Entering World now requires a server-verified Guest credential. When no credential
+exists, the browser POSTs an empty JSON object to /guest-account. The server creates
+a UUID Player and a random 32-byte (256-bit) credential in one transaction. Only
+its SHA-256 hash is stored in migration **v2 guest_credentials**, linked uniquely
+to players. The raw credential is returned only in the account creation response,
+with Cache-Control: no-store; no Guild or gold is created. Existing v1 data remains.
+
+The browser stores the credential under `guild-to-glory.guest-credential`. It sends
+it as an Authorization Bearer header during Colyseus matchmaking, not in URL query
+parameters or room options. Server static onAuth checks it before room admission;
+verified playerId is bound to client.auth, independently of client-supplied profile
+or Party IDs. Player-ID-only joins and extra auth options are rejected. The private
+`guest:identity` response to world:sync shows your Player ID in the World panel;
+credentials are never placed in World/Party shared state or application logs.
+
+Initialization shares one pending promise per tab and uses a same-origin Web Lock
+across tabs when supported. Existing credentials are preserved on network errors
+and authentication failure; invalid credentials do not trigger account creation.
+Retry uses the existing credential. If localStorage writing fails after creation,
+the same tab retains the issued credential in memory for a save retry. Without
+Web Locks, simultaneous first-use tabs may still create extra accounts. A lost
+creation response or closing the tab before saving can orphan an account; there is
+no recovery or account merge flow in this milestone. Do not delete credentials to
+work around a temporary server failure. Clearing browser data loses access.
+
+Basic abuse limits are 5 guest creation requests per socket IP per 10 minutes and
+100 globally per hour; malformed POSTs count. Auth allows 60 attempts per socket IP
+per minute. Limiters are bounded, in-memory and reset on restart. Forwarded IP
+headers are not trusted, so clients behind a reverse proxy share that proxy's
+budget. Configure additional proxy limits for public deployments. Creation accepts
+only POST application/json with an empty object, at most 128 bytes and a five-second
+body deadline. Browser origins are controlled by GUEST_ALLOWED_ORIGINS (see
+server/.env.example). CORS is not authentication and does not stop non-browser bots.
+
+Local testing with two accounts:
+1. Start the server with the intended DATABASE_PATH and the Vite client.
+2. Open two separate browser profiles (not two tabs sharing one profile).
+3. Enter World in both and compare the displayed Guest Player IDs; they differ.
+4. Refresh/reconnect each profile, then restart the server and reconnect. Each
+   profile keeps its original Player ID. Same-profile tabs share an account.
+5. Existing Guild/Gold/Roster/Recruitment/Party data stays in that browser; no Guild
+   ownership is inferred from old Local Profile IDs and nothing is imported.
+
+Security limits: a localStorage bearer credential can be stolen by XSS or by someone
+with browser-profile access. Anyone holding it can use the Guest account. There is
+no username/password, revocation UI, rotation, account recovery or cross-device
+Guild sync. Deploy behind HTTPS/WSS, set VITE_SERVER_URL to the WSS endpoint and
+GUEST_ALLOWED_ORIGINS to the HTTPS frontend origin; HTTPS pages reject insecure
+server configuration. Redact Authorization headers and guest response bodies from
+proxy/APM logs, and never cache /guest-account. Protect against XSS and use a suitable
+CSP. These are prototype credentials, not a production authentication solution.
+
+## M5.3.2C1 Server-Authoritative Guild Integration
+
+Guild Management now uses SQLite via authenticated HTTP, independently of World
+connections. The prior milestone sections above describe historical behavior.
+The browser's original Guild is never automatically imported, reset or deleted.
+Guest credentials still use the B flow. All Guild ownership comes from the bearer
+credential checked on each request, never from an ownerPlayerId supplied by clients.
+
+API contract (same server as /guest-account):
+- GET /guild with Authorization: Bearer credential returns
+  { ok, guild: GuildData | null, revision, features: { debugGold, legacyImport } }.
+- POST /guild with that header and application/json accepts only
+  { requestId: UUID, expectedRevision: nonnegative integer, action }.
+- Actions: {type:"create", name}; {type:"recruitment", action:{type:"roll"}};
+  recruitment recruit/reject/dismiss also require the reviewed adventurer id;
+  {type:"party", action:{type:"add"|"remove"|"setLeader",id}}, party clear, or
+  party replace with id/replacementId. Development actions are {type:"debugGold"}
+  and {type:"importLegacy",guild:legacyGuildData}.
+- POST returns the current authoritative state plus requestId and ok. Rejections
+  include error:{code,message}; CONFLICT means reload/review before a new command.
+  Invalid auth/payload, oversized bodies and unavailable service use structured
+  HTTP errors. There is no route to read another owner's Guild.
+
+Requests are limited to 256 KiB, five seconds for the body and 120 requests/minute
+per socket IP. Authorization and no-store/CORS rules apply to both methods. No
+credential is included in command payloads, receipts or shared state.
+
+Migration **v3 guild_commands** adds guild_revisions and guild_commands. An outer
+BEGIN IMMEDIATE transaction loads the latest data, checks revision and receipt,
+executes the existing recruitment/party transition, persists the whole snapshot,
+advances revision and records the outcome. Nested savepoints roll back failed
+operations. A duplicate request ID with the same fingerprint returns its original
+outcome with the latest state; a different fingerprint is rejected. Rejected domain
+commands are recorded too. Receipts remain across restart and are not automatically
+expired, avoiding old retries executing again. Their storage grows with commands.
+
+The browser holds unresolved commands in per-account/per-endpoint sessionStorage,
+separate from legacy Guild storage, before sending them. Refresh / Retry reuses the
+same request ID after lost responses or page reload. It blocks new commands until
+that request is resolved. Server state is never optimistically changed. Focus and
+manual refresh reload state; stale commands from other tabs return CONFLICT with
+current data. Losing sessionStorage loses the local retry handle; refresh and
+inspect the authoritative state before issuing a new action. No single-session
+restriction or session takeover is implemented.
+
+A Guild is created once with level 1, 40,000 G and empty roster/party. Server calls
+the unchanged M3 generator through the existing recruitment transition: each Roll
+costs 10,000 G; one pending recruit; no extra recruit fee or reject/dismiss refund;
+roster capacity 8 and party capacity 4. Dismissing a leader clears the leader and
+party reference atomically. Client-supplied stats or recruitment results are rejected.
+
+Development setup (PowerShell, before starting the server):
+`$env:NODE_ENV = 'development'`
+`$env:ENABLE_LEGACY_IMPORT = 'true'`
+
+Debug Gold adds 100,000 G through the authenticated API and SQLite only when
+NODE_ENV is exactly development. Import additionally requires the explicit flag.
+Undefined/test/production modes disable both even if the client sends requests.
+Do not expose an import-enabled development server as a public gameplay server.
+
+To import, open Guild on an account without a server Guild, choose Preview Legacy
+Guild, review the complete data and Confirm Import. Server validates all data and
+references, preserves IDs/creation time/gold/roster/pending/party, rejects collisions
+and duplicate imports, and commits atomically. The browser original remains intact.
+Production servers always reject legacy import and debug gold.
+
+Two-account test: open Chrome and Edge with different browser profiles, enter Guild
+and create separate Guilds. Roll/recruit, add members and select leaders in each.
+Verify changes in A do not affect B; refresh both and restart the server using the
+same DATABASE_PATH to verify persistence. For one account in two tabs, make a change
+in one tab, then act on stale state in the other: review the conflict and retry from
+fresh state. Existing World 1-1 click-to-move still supports both sessions. World
+party summaries remain untrusted display snapshots, now sourced by the normal client
+from GET /guild; they never write the Guild database. Use Sync Current Party to
+refresh the World display. No party spawn/follow/combat is added.

@@ -10,3 +10,4 @@ export * from "./guild.js";
 export * from "./recruitment.js";
 export * from "./party.js";
 export * from "./partyNetwork.js";
+export * from "./guildApi.js";

@@ -1,3 +1,6 @@
+import { GuildDatabase } from "../../server/src/database/database.js";
+import { Guests } from "../../server/src/auth/guests.js";
+import { authenticatedRoom } from "../../server/src/auth/authenticatedRoom.js";
 import { expect, it, vi } from "vitest";
 import { Server } from "@colyseus/core";
 import { WebSocketTransport } from "@colyseus/ws-transport";
@@ -12,28 +15,38 @@ import { generateAdventurer } from "../src/adventurer.js";
 it("real Colyseus clients isolate parties, move on map 1-1, reject bad data and reconnect",async()=>{
   const transport=new WebSocketTransport();
   const server=new Server({transport,greet:false,gracefullyShutdown:false});
-  server.define(ROOM_NAME,ConnectionRoom);
+  const database=new GuildDatabase(":memory:");
+  const guests=new Guests(database);
+  const accountA=guests.create(),accountB=guests.create();
+  server.define(ROOM_NAME,authenticatedRoom(guests));
   const rooms:Room[]=[];
   try {
     await server.listen(0,"127.0.0.1");
     const address=transport.server!.address() as {port:number};
     const url="ws://127.0.0.1:"+address.port;
-    async function connect(){
-      const room=await new Client(url).joinOrCreate(ROOM_NAME);rooms.push(room);
-      const seen={parties:[] as PartyStateMessage["parties"],players:[] as any[],results:[] as any[],map:null as any};
+    async function connect(account=accountA){
+      const client=new Client(url);client.auth.token=account.credential;
+      const room=await client.joinOrCreate(ROOM_NAME);rooms.push(room);
+      const seen={parties:[] as PartyStateMessage["parties"],players:[] as any[],results:[] as any[],map:null as any,identity:null as any};
+      room.onMessage("guest:identity",m=>{seen.identity=m;});
       room.onMessage(NETWORK_MESSAGES.partyState,m=>{seen.parties=m.parties;});
       room.onMessage(NETWORK_MESSAGES.worldState,m=>{seen.players=m.players;});
       room.onMessage(NETWORK_MESSAGES.worldMap,m=>{seen.map=m;});
       room.onMessage(NETWORK_MESSAGES.partyResult,m=>{seen.results.push(m);});
       room.send(NETWORK_MESSAGES.worldSync);return {room,seen};
     }
-    const a=await connect();const b=await connect();expect(a.room.roomId).toBe(b.room.roomId);
+    const a=await connect();const b=await connect(accountB);expect(a.room.roomId).toBe(b.room.roomId);
     const ga=createGuild("Guild Alpha");ga.roster=[{...generateAdventurer(),id:crypto.randomUUID()}];
     ga.activeParty={memberIds:[ga.roster[0]!.id],leaderId:ga.roster[0]!.id};
     const sa=createPartySnapshot(ga,crypto.randomUUID(),1);
     const sb=createPartySnapshot(createGuild("Guild Beta"),crypto.randomUUID(),1);
     a.room.send(NETWORK_MESSAGES.partySnapshot,sa);b.room.send(NETWORK_MESSAGES.partySnapshot,sb);
     await vi.waitFor(()=>{expect(a.seen.parties.find(p=>p.sessionId===a.room.sessionId)?.guildName).toBe("Guild Alpha");expect(a.seen.parties.find(p=>p.sessionId===b.room.sessionId)?.guildName).toBe("Guild Beta");});
+    expect(a.seen.identity).toEqual({playerId:accountA.playerId});
+    expect(b.seen.identity).toEqual({playerId:accountB.playerId});
+    await expect(new Client(url).joinOrCreate(ROOM_NAME,{playerId:accountA.playerId})).rejects.toThrow(/authentication/);
+    const invalid=new Client(url);invalid.auth.token="0".repeat(64);
+    await expect(invalid.joinOrCreate(ROOM_NAME)).rejects.toThrow(/authentication/);
     expect(a.seen.map.mapId).toBe("1-1");expect(b.seen.map.mapId).toBe("1-1");
     const bParty=structuredClone(a.seen.parties.find(p=>p.sessionId===b.room.sessionId));
     a.room.send(NETWORK_MESSAGES.partySnapshot,{...sa,revision:3,leaderId:null});
@@ -51,8 +64,11 @@ it("real Colyseus clients isolate parties, move on map 1-1, reject bad data and 
     const reconnected=await connect();reconnected.room.send(NETWORK_MESSAGES.partySnapshot,sa);
     await vi.waitFor(()=>expect(b.seen.parties.find(p=>p.sessionId===reconnected.room.sessionId)?.guildName).toBe("Guild Alpha"));
     expect(b.seen.parties).toHaveLength(2);
+    expect(reconnected.seen.identity).toEqual({playerId:accountA.playerId});
+    expect(JSON.stringify(b.seen)).not.toContain(accountA.credential);
   } finally {
     await Promise.all(rooms.filter(room=>room.connection.isOpen).map(room=>room.leave().catch(()=>{})));
     await server.gracefullyShutdown(false);
+    database.close();
   }
 },15000);

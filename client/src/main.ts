@@ -1,5 +1,7 @@
+import { createGuildApi } from "./guildApi.js";
+import { browserGuestAccount } from "./guestAccount.js";
 import { loadLocalProfile, LOCAL_PROFILE_STORAGE_KEY } from "./localProfile.js";
-import { createGuildRepository, GUILD_STORAGE_KEY } from "./guildStorage.js";
+import { GUILD_STORAGE_KEY } from "./guildStorage.js";
 import { createPartySync } from "./partySync.js";
 import type { PartyStateMessage, PartyResultMessage } from "@guild-to-glory/shared";
 import { setupGuildSection } from "./guildSection.js";
@@ -49,6 +51,7 @@ type ConnectionStatus = "connecting" | "connected" | "disconnected" | "error";
 type SectionName = "menu" | "world" | "editor" | "adventurers" | "guild";
 
 const serverUrl = import.meta.env.VITE_SERVER_URL || "ws://localhost:2567";
+const guestAccount=browserGuestAccount(serverUrl);
 const connectButton = document.querySelector<HTMLButtonElement>("#connect-button")!;
 const connectLabel = document.querySelector<HTMLSpanElement>("#connect-label")!;
 const statusLabel = document.querySelector<HTMLParagraphElement>("#connection-status")!;
@@ -65,7 +68,8 @@ const sections: Record<SectionName, HTMLElement> = {
   editor: document.querySelector<HTMLElement>("#editor-section")!,
   adventurers: document.querySelector<HTMLElement>("#adventurers-section")!
 };
-const refreshGuild = setupGuildSection(sections.guild);
+const guildApi=createGuildApi(serverUrl,guestAccount,()=>window.sessionStorage);
+const refreshGuild = setupGuildSection(sections.guild,guildApi);
 const navigationButtons = document.querySelectorAll<HTMLButtonElement>("[data-section]");
 const worldInfo = document.querySelector<HTMLDivElement>("#world-info")!;
 const partySummary = document.querySelector<HTMLElement>("#world-party-summary")!;
@@ -375,6 +379,7 @@ function setStatus(nextStatus: ConnectionStatus, detail: string): void {
 }
 
 function resetWorld(view: WorldView): void {
+  document.querySelector<HTMLElement>("#guest-player-id")!.textContent="";
   view.clearMap();
   playerCount.textContent = "0 players";
   worldInfo.hidden = true;
@@ -661,6 +666,9 @@ async function connectToServer(): Promise<void> {
 
   try {
     const profileId = await loadLocalProfile();
+    const credential = await guestAccount.ensure();
+    if(attempt!==connectionAttempt || currentSection!=="world")return;
+    client.auth.token=credential;
     const room = await client.joinOrCreate(ROOM_NAME);
     if (attempt !== connectionAttempt || currentSection !== "world") {
       await room.leave();
@@ -673,7 +681,7 @@ async function connectToServer(): Promise<void> {
     }
     activeRoom = room;
     stopPartySync();
-    partySync=createPartySync(room,createGuildRepository(()=>window.localStorage),profileId,message=>{partySyncStatus.textContent=message;});
+    partySync=createPartySync(room,{load:async()=>{const result=await guildApi.load();return result.guild?{status:"ready" as const,guild:result.guild}:{status:"empty" as const};}},profileId,message=>{partySyncStatus.textContent=message;});
     worldInfo.hidden = false;
     let mapReady = false;
     let receivingMap = false;
@@ -713,6 +721,9 @@ async function connectToServer(): Promise<void> {
       playerCount.textContent = message.players.length + " players";
     });
 
+    room.onMessage<{playerId:string}>("guest:identity",message=>{
+      if(activeRoom===room)document.querySelector<HTMLElement>("#guest-player-id")!.textContent="Guest Player: "+message.playerId;
+    });
     room.onMessage<PartyStateMessage>(NETWORK_MESSAGES.partyState, message => {
       if(activeRoom!==room)return;
       partySummary.replaceChildren(...message.parties.map(party=>{

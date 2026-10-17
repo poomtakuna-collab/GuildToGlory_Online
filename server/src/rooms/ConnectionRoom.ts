@@ -59,6 +59,7 @@ export class ConnectionRoom extends Room {
     });
 
     this.onMessage(NETWORK_MESSAGES.worldSync, (client: Client) => {
+      if(client.auth?.playerId) client.send("guest:identity",{playerId:client.auth.playerId});
       client.send(NETWORK_MESSAGES.worldMap, { mapId: this.mapId, mapName: this.world.registry.maps.find(entry => entry.id === this.mapId)!.name, map: this.map });
       client.send(NETWORK_MESSAGES.worldState, this.createWorldState());
       client.send(NETWORK_MESSAGES.partyState,this.parties.state());
