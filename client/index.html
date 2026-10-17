@@ -17,6 +17,7 @@
           <button type="button" data-section="menu" aria-current="page">Main Menu</button>
           <button type="button" data-section="world">World</button>
           <button type="button" data-section="editor">Map Editor</button>
+          <button type="button" data-section="guild">Guild</button>
           <button type="button" data-section="adventurers">Adventurers</button>
         </nav>
         <span class="edition">ONLINE WORLDS <i></i> FOUNDATION</span>
@@ -30,6 +31,7 @@
           <div class="menu-actions">
             <button class="connect-button" type="button" data-section="world">Enter World</button>
             <button class="secondary-button" type="button" data-section="editor">Map Editor</button>
+            <button class="secondary-button" type="button" data-section="guild">Guild</button>
             <button class="secondary-button" type="button" data-section="adventurers">Adventurers</button>
           </div>
           <p class="server-address">GAME SERVER <span id="server-address"></span></p>
@@ -48,6 +50,12 @@
           </div>
         </div>
 
+        <section class="world-party-panel" aria-labelledby="world-party-title">
+          <h2 id="world-party-title">Session Guilds &amp; Parties</h2>
+          <button id="sync-party" class="secondary-button" type="button">Sync Current Party</button>
+          <p id="party-sync-status" role="status" aria-live="polite"></p>
+          <ul id="world-party-summary"></ul>
+        </section>
         <div class="world-stage">
           <div id="pixi-root" class="world" aria-hidden="true"></div>
           <div class="world-shade" aria-hidden="true"></div>
@@ -159,6 +167,41 @@
             <div id="map-editor-root" class="editor-map" aria-label="Isometric map editing canvas"></div>
           </div>
         </div>
+      </section>
+
+      <section id="guild-section" class="page-section guild-section" aria-labelledby="guild-title" hidden>
+        <div class="section-heading"><div><p class="eyebrow">Your Guild</p><h1 id="guild-title">Guild</h1></div>
+          <button class="secondary-button" type="button" data-section="menu">Main Menu</button></div>
+        <p data-guild-status role="status" aria-live="polite"></p>
+        <form class="guild-create">
+          <h2>Create Guild</h2>
+          <p>Begin at Level 1 with 40,000 G and 8 empty roster slots.</p>
+          <label for="guild-name">Guild Name</label>
+          <input id="guild-name" name="guildName" required aria-describedby="guild-name-help" autocomplete="off">
+          <p id="guild-name-help">Use 3?24 characters. Surrounding spaces are removed.</p>
+          <button class="connect-button" type="submit">Create Guild</button>
+        </form>
+        <div data-guild-details hidden>
+          <h2 data-guild-name></h2>
+          <dl class="guild-summary"><div><dt>Level</dt><dd data-guild-level></dd></div><div><dt>Gold</dt><dd data-guild-gold></dd></div><div><dt>Adventurer Roster</dt><dd data-guild-roster></dd></div></dl>
+          <section class="guild-party" aria-labelledby="party-title">
+            <h2 id="party-title">Active Party <span data-party-count></span></h2>
+            <p data-party-status role="status" aria-live="polite"></p>
+            <ul class="guild-slots" data-party-slots aria-label="Active Party"></ul>
+            <button type="button" class="secondary-button" data-party-clear>Clear Party</button>
+            <p>Select a roster member to view details or replace a Party member. Removing a leader requires choosing a new leader.</p>
+          </section>
+          <h2>Guild Roster</h2>
+          <ul class="guild-slots" data-guild-slots aria-label="Adventurer roster"></ul>
+          <section data-recruitment aria-labelledby="recruitment-title">
+            <h2 id="recruitment-title">Recruitment</h2>
+            <button type="button" class="connect-button" data-roll>Roll Adventurer - 10,000 G</button>
+            <p data-roll-help></p>
+            <div data-pending hidden></div>
+            <div data-member hidden></div>
+          </section>
+        </div>
+        <p class="guild-storage-note">Guild progress is saved in this browser profile. Keep browser site data to retain your Guild.</p>
       </section>
 
       <section id="adventurers-section" class="page-section adventurers-section" aria-labelledby="adventurers-title" hidden>

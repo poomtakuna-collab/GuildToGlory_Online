@@ -1,3 +1,4 @@
+import { PartySessions } from "../partySessions.js";
 import { getWorldMaps } from "../worldMaps.js";
 import { Room, type Client } from "@colyseus/core";
 import {
@@ -23,12 +24,18 @@ const PLAYER_COLORS = [0xe5bd69, 0x70b8a0, 0xd97d69, 0x8c9ddd, 0xd783b4, 0xa7bd6
 
 export class ConnectionRoom extends Room {
   private readonly players = new Map<string, PlayerState>();
+  private readonly parties = new PartySessions();
   private nextPlayerNumber = 0;
   private readonly world = getWorldMaps();
   private readonly mapId = this.world.registry.startingMapId;
   private readonly map = this.world.maps.get(this.mapId)!;
 
   onCreate(): void {
+    this.onMessage(NETWORK_MESSAGES.partySnapshot, (client: Client, payload: unknown) => {
+      const result=this.parties.receive(client.sessionId,payload);
+      client.send(NETWORK_MESSAGES.partyResult,result);
+      if(result.ok) this.broadcast(NETWORK_MESSAGES.partyState,this.parties.state());
+    });
     this.onMessage(NETWORK_MESSAGES.ping, (client: Client, payload: unknown) => {
       if (!isPingMessage(payload)) return;
 
@@ -54,12 +61,15 @@ export class ConnectionRoom extends Room {
     this.onMessage(NETWORK_MESSAGES.worldSync, (client: Client) => {
       client.send(NETWORK_MESSAGES.worldMap, { mapId: this.mapId, mapName: this.world.registry.maps.find(entry => entry.id === this.mapId)!.name, map: this.map });
       client.send(NETWORK_MESSAGES.worldState, this.createWorldState());
+      client.send(NETWORK_MESSAGES.partyState,this.parties.state());
     });
 
     this.setSimulationInterval((deltaTime) => this.updatePlayers(deltaTime), 1000 / TICK_RATE);
   }
 
   onJoin(client: Client): void {
+    this.parties.join(client.sessionId);
+    this.broadcast(NETWORK_MESSAGES.partyState,this.parties.state());
     const playerNumber = ++this.nextPlayerNumber;
     const spawn = this.world.spawn;
     this.players.set(client.sessionId, {
@@ -76,6 +86,8 @@ export class ConnectionRoom extends Room {
 
   onLeave(client: Client): void {
     this.players.delete(client.sessionId);
+    this.parties.leave(client.sessionId);
+    this.broadcast(NETWORK_MESSAGES.partyState,this.parties.state());
     this.broadcastWorldState();
   }
 

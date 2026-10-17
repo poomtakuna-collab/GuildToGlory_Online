@@ -197,3 +197,168 @@ The map snapshot is sent on initial synchronization, not on each movement tick. 
 maps/embedded assets increase join payload and browser loading/rendering cost; this
 foundation is initially tuned for 20x20 maps, and World currently draws the whole map.
 The editor's independent camera/culling and local Play Test remain unchanged.
+
+## M5.1 Guild Foundation
+
+Open **Guild** from the Main Menu and enter a name of 3?24 Unicode code points
+(after trimming surrounding spaces). A new Guild starts at level 1, with 40,000 G
+and an empty roster of capacity 8. Adventurers remains the independent generator;
+no generated character is automatically recruited. Recruitment is not implemented.
+
+Guild data uses localStorage key `guild-to-glory.guild` with schema version 1.
+Reloads only read/validate data; creation refuses to replace any existing value,
+including corrupt or unsupported data. Storage errors are shown without resetting
+or overwriting the profile. There is no reset button or automatic migration.
+The adapter is separate from the shared model and Guild UI. Web Locks serialize
+creation across tabs where available; older browsers without Web Locks only have
+a synchronous existence check, not a cross-tab transaction.
+
+Persistence belongs to this browser profile and origin (host/port/protocol).
+Clearing site data, private browsing expiration, or changing origin can lose access
+to the profile. localStorage is editable by the user and is **not authoritative
+multiplayer persistence**. Guild data is never sent through the World protocol.
+Schema v1 roster entries preserve GeneratedAdventurer data plus a unique ID;
+validation currently targets the M3 level-1 definitions. Future progression or
+registry changes require an explicit schema migration.
+
+## M5.2 Recruitment and dismissal
+
+Guild now supports one pending recruit. Each roll costs 10,000 G; Recruit costs
+nothing further and Reject does not refund the roll. Click a roster member to see
+their original stats, skills and trait effects. Dismiss requires confirmation and
+refunds nothing. A full roster can still hold a pending recruit while a member is dismissed.
+
+Schema 2 adds pendingRecruit. Schema 1 is validated and converted in memory without
+changing the Guild ID, name, creation time, roster or gold. The next successful
+action saves schema 2; loading alone never writes or grants money. Each action
+saves the complete Guild snapshot in one localStorage setItem, so gold and the
+pending recruit cannot be saved separately. Failed saves leave the stored snapshot
+and displayed balance intact. Pending decisions carry an ID to reject stale tabs.
+Web Locks serialize UI writes where supported; browsers without Web Locks retain
+the earlier cross-tab race limitation. This remains editable local prototype data.
+
+Development builds alone show Developer Debug with +100,000 G. Production builds
+omit the panel and reject the debug operation. Debug money already saved locally
+remains part of that local profile; no Guild money is sent to multiplayer.
+
+## M5.3 Active Party Management
+
+In Guild, use Add to Party on the roster to select up to four adventurers. Click a
+member's name to inspect their roster stats, skills and traits. Set Leader chooses
+one current member; a party with at least one member and a leader is Ready.
+A party without a leader can still be saved. Remove, replacing the leader, or
+dismissing the leader clears that role until another member is explicitly chosen.
+Select a roster member outside the party, then use Replace with on a party slot
+to replace that member even when full. Clear Party removes all party selections.
+
+Schema 3 adds activeParty containing only memberIds and leaderId. Schema 1/2
+profiles load with an empty party and preserve gold, roster and pending recruits;
+the next successful action saves schema 3. Invalid references block loading and
+writes without resetting the stored profile. Dismissal and party changes save the
+entire Guild in one storage operation; a failed save restores the persisted view.
+The existing localStorage and cross-tab Web Locks limitations still apply.
+Party readiness is informational only: no World, multiplayer, combat, AI or
+formation integration is included in M5.3.
+
+## M5.3.1 Multiplayer Guild & Party Identity Prototype
+
+Connecting to World creates/reuses a random UUID in localStorage key
+`guild-to-glory.local-profile`. This separate key does not reset or rewrite any
+Guild data. A fresh connection sends the current persisted Guild's Party snapshot;
+an absent Guild sends an explicit empty, Not Ready state. Invalid Guild/profile
+storage reports an error instead of inventing Guild data.
+
+The World panel lists each session's Guild and Party members (name, rarity, level,
+leader and Ready status). It still renders one moving placeholder per session.
+Use **Sync Current Party** to resend current saved data without creating a session.
+Guild changes from another same-origin tab also trigger sync via storage events.
+Navigating away from World retains the existing disconnect behavior; returning
+connects again and sends current saved data. Browser profiles have independent
+localStorage; use two browser profiles to test two independent Guilds.
+
+Network messages:
+- `party:snapshot` client -> server: protocolVersion 1, per-connection increasing
+  revision, profileId, guildId/name, memberIds, leaderId and minimal member displays.
+- `party:result` server -> sender: accepted/rejected result, revision and message.
+- `party:state` server -> room: summaries keyed by server-issued sessionId; excludes
+  profileId, economy, pending recruits, stats, skills and traits.
+
+Server validation uses an exact field allowlist, maximum four unique member IDs,
+leader membership, matching displays, bounded strings and a 4096-byte JSON limit.
+IDs are at most 128 UTF-16 code units; member names 80; Guild names 3?24 code points
+(and at most 48 code units). Member levels remain 1 and rarity uses the existing
+five display categories. Duplicate/older revisions are rejected without mutation.
+Session removal clears its snapshot; reconnect starts a new revision sequence.
+
+This is not authentication: profile and Guild identity/display data are client
+claims, not verified ownership or server-authoritative progression. Guild data
+remains only in localStorage; no database, cross-device sync, login, combat,
+formation or party following is implemented. Web Locks serialize profile creation
+where available; unsupported browsers retain a first-use cross-tab race limitation.
+Server restart loses session snapshots; clients resend after connecting again.
+
+Automated tests include two real Colyseus clients, session cleanup/reconnect and
+movement isolation. Vitest uses a thread pool because Colyseus PM2 metrics use
+process IPC, which conflicts with Vitest's default fork worker channel.
+
+## M5.3.2A SQLite Database Foundation
+
+The server now opens a SQLite database at startup and closes it on Colyseus
+shutdown (with an exit fallback). No accounts, Guilds, starting gold or imported
+localStorage data are created on startup. Guild UI and party network behavior
+remain unchanged; repositories are not called by rooms or UI.
+
+Driver: built-in Node `node:sqlite` / `DatabaseSync`, verified on the existing
+Node v24.18.0 runtime; no npm dependency or runtime upgrade is needed. On the
+project's older minimum Node 22.12, node:sqlite needs `--experimental-sqlite`;
+Node 22.13+ exposes it without that flag. The API is synchronous, so future
+high-volume gameplay work should review event-loop impact before integration.
+
+Default file: `server/data/guild.sqlite`, independent of the launch directory.
+Set the server environment variable `DATABASE_PATH` to an absolute path or a path
+relative to `server/`. It must use a lowercase .sqlite, .sqlite3 or .db extension
+and be outside the client directory. Example in PowerShell:
+
+`$env:DATABASE_PATH = 'data/guild.sqlite'`
+
+Then run `npm.cmd run dev:server`. See `server/.env.example`; .env files are not
+automatically loaded. Keep database files outside any externally hosted static
+asset directories. Vite denies SQLite database/journal files from workspace file
+serving; the database is never imported by client/shared code. Database files and
+WAL/SHM/journal sidecars are gitignored.
+
+Migration version **1**, named **guild_foundation**, creates:
+- players: unique ID and creation/update timestamps, no login credentials.
+- guilds: unique owner_player_id FK (one Guild per Player), name, level, gold,
+  timestamps. Repository creation requires explicit gold and level.
+- adventurers: Guild FK, ordered roster, full generated data; rarity, base stats,
+  skills and traits are JSON. Race, class and total stats are preserved too.
+- pending_recruits: one JSON adventurer per Guild and timestamp.
+- active_parties: one per Guild with nullable leader.
+- active_party_members: unique member and slot per Guild, slots 0 through 3,
+  composite FK enforcing same-Guild adventurers. A deferred FK requires the
+  leader to be in the party. Removing a member clears their leader role.
+- schema_migrations: applied version/name/time records.
+
+Initialization enables foreign keys, a five-second busy timeout and WAL with FULL
+synchronous durability. Pending migrations run atomically, check foreign keys and
+record versions only after success. Unknown migration histories and invalid files
+fail startup without resetting the database. Do not delete databases to migrate.
+
+`server/src/database/repository.ts` provides create/find Player, create/find/update
+Guild (including lookup by owner), save/load ordered roster, save/load/clear pending
+recruit, and save/load active party. Parameters are bound in prepared statements.
+`repository.transaction(repo => { ... })` groups calls using a synchronous callback;
+nested calls use savepoints. Do not use async callbacks, promises or external side
+effects inside these transactions. Errors propagate to the caller after rollback.
+To move a pending recruit into a roster, clear pending and save roster within one
+transaction. Saving a roster removes references to removed members atomically and
+preserves unchanged party membership. Pending save explicitly replaces its one row.
+The future business layer must enforce roster capacity 8 and authorization; this
+foundation validates serialized current generated characters but adds no economy.
+
+Tests use temporary databases and delete them after closing connections. They cover
+migration failure, reopen persistence, two owners, serialization, FK/slot/leader
+constraints, multi-table rollback and write errors, alongside existing regressions.
+No authentication, browser import, cross-device sync, gameplay integration, backup
+service or later milestone is included.

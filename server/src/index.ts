@@ -1,3 +1,4 @@
+import { GuildDatabase, databasePath } from "./database/database.js";
 import { getWorldMaps } from "./worldMaps.js";
 import { Server } from "@colyseus/core";
 import { WebSocketTransport } from "@colyseus/ws-transport";
@@ -11,9 +12,24 @@ try {
   process.exit(1);
 }
 
+let database: GuildDatabase;
+try {
+  database=new GuildDatabase(databasePath());
+} catch(error) {
+  console.error("Database initialization failed:",error instanceof Error ? error.message : error);
+  process.exit(1);
+}
+process.once("exit",()=>database.close());
 const port = Number(process.env.PORT ?? 2567);
 const gameServer = new Server({ transport: new WebSocketTransport() });
 
 gameServer.define(ROOM_NAME, ConnectionRoom);
-await gameServer.listen(port);
+gameServer.onShutdown(()=>database.close());
+try {
+  await gameServer.listen(port);
+} catch(error) {
+  database.close();
+  await gameServer.gracefullyShutdown(false);
+  throw error;
+}
 console.log(`GuildToGlory game server listening on port ${port}`);

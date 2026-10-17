@@ -1,3 +1,8 @@
+import { loadLocalProfile, LOCAL_PROFILE_STORAGE_KEY } from "./localProfile.js";
+import { createGuildRepository, GUILD_STORAGE_KEY } from "./guildStorage.js";
+import { createPartySync } from "./partySync.js";
+import type { PartyStateMessage, PartyResultMessage } from "@guild-to-glory/shared";
+import { setupGuildSection } from "./guildSection.js";
 import { Client, type Room } from "colyseus.js";
 import { Application, Container, Graphics, Rectangle, Text, Sprite, type Texture } from "pixi.js";
 import { importPngFile, prepareTileTextures } from "./tileImages.js";
@@ -41,7 +46,7 @@ import {
 import "./style.css";
 
 type ConnectionStatus = "connecting" | "connected" | "disconnected" | "error";
-type SectionName = "menu" | "world" | "editor" | "adventurers";
+type SectionName = "menu" | "world" | "editor" | "adventurers" | "guild";
 
 const serverUrl = import.meta.env.VITE_SERVER_URL || "ws://localhost:2567";
 const connectButton = document.querySelector<HTMLButtonElement>("#connect-button")!;
@@ -54,13 +59,23 @@ const worldServerAddress = document.querySelector<HTMLSpanElement>("#server-addr
 const roundTripTime = document.querySelector<HTMLSpanElement>("#round-trip-time")!;
 const worldRoot = document.querySelector<HTMLDivElement>("#pixi-root")!;
 const sections: Record<SectionName, HTMLElement> = {
+  guild: document.querySelector<HTMLElement>("#guild-section")!,
   menu: document.querySelector<HTMLElement>("#menu-section")!,
   world: document.querySelector<HTMLElement>("#world-section")!,
   editor: document.querySelector<HTMLElement>("#editor-section")!,
   adventurers: document.querySelector<HTMLElement>("#adventurers-section")!
 };
+const refreshGuild = setupGuildSection(sections.guild);
 const navigationButtons = document.querySelectorAll<HTMLButtonElement>("[data-section]");
 const worldInfo = document.querySelector<HTMLDivElement>("#world-info")!;
+const partySummary = document.querySelector<HTMLElement>("#world-party-summary")!;
+const partySyncStatus = document.querySelector<HTMLElement>("#party-sync-status")!;
+let partySync: ReturnType<typeof createPartySync> | undefined;
+const stopPartySync = () => { partySync?.stop(); partySync=undefined; partySummary.replaceChildren(); partySyncStatus.textContent=""; };
+document.querySelector("#sync-party")!.addEventListener("click",()=>partySync?.sync());
+window.addEventListener("storage",event=>{
+  if(event.key===GUILD_STORAGE_KEY || event.key===LOCAL_PROFILE_STORAGE_KEY || event.key===null) partySync?.sync();
+});
 const playerCount = document.querySelector<HTMLSpanElement>("#player-count")!;
 const editorRoot = document.querySelector<HTMLDivElement>("#map-editor-root")!;
 const editorStatus = document.querySelector<HTMLParagraphElement>("#editor-status")!;
@@ -586,6 +601,7 @@ async function importEditorPngs(files: File[]): Promise<void> {
 }
 
 async function leaveWorld(): Promise<void> {
+  stopPartySync();
   connectionAttempt += 1;
   const room = activeRoom;
   activeRoom = undefined;
@@ -604,6 +620,7 @@ async function showSection(section: SectionName): Promise<void> {
   if (currentSection === "world" && section !== "world") await leaveWorld();
   if (currentSection === "editor" && section !== "editor" && editorPlayTestActive) await stopEditorPlayTest();
   currentSection = section;
+  if (section === "guild") refreshGuild();
 
   for (const [name, element] of Object.entries(sections) as [SectionName, HTMLElement][]) {
     element.hidden = name !== section;
@@ -643,6 +660,7 @@ async function connectToServer(): Promise<void> {
   roundTripTime.textContent = "ESTABLISHING LINK";
 
   try {
+    const profileId = await loadLocalProfile();
     const room = await client.joinOrCreate(ROOM_NAME);
     if (attempt !== connectionAttempt || currentSection !== "world") {
       await room.leave();
@@ -654,12 +672,15 @@ async function connectToServer(): Promise<void> {
       return;
     }
     activeRoom = room;
+    stopPartySync();
+    partySync=createPartySync(room,createGuildRepository(()=>window.localStorage),profileId,message=>{partySyncStatus.textContent=message;});
     worldInfo.hidden = false;
     let mapReady = false;
     let receivingMap = false;
     let latestState: WorldStateMessage = {players:[]};
     const failMap = async (error: unknown) => {
       if (activeRoom !== room) return;
+      stopPartySync();
       activeRoom = undefined;
       clearTimeout(mapTimeout);
       resetWorld(worldView);
@@ -692,6 +713,18 @@ async function connectToServer(): Promise<void> {
       playerCount.textContent = message.players.length + " players";
     });
 
+    room.onMessage<PartyStateMessage>(NETWORK_MESSAGES.partyState, message => {
+      if(activeRoom!==room)return;
+      partySummary.replaceChildren(...message.parties.map(party=>{
+        const item=document.createElement("li");
+        const members=party.members.map(member=>member.name+" ("+member.rarity+", Lv "+member.level+")"+(member.id===party.leaderId?" [Leader]":"")).join(", ");
+        item.textContent=(party.sessionId===room.sessionId?"You":party.sessionId)+" | "+(party.guildName??"No Guild")+" | "+party.memberIds.length+"/4 | "+(party.ready?"Ready":"Not Ready")+(members?": "+members:"");
+        return item;
+      }));
+    });
+    room.onMessage<PartyResultMessage>(NETWORK_MESSAGES.partyResult, message=>{
+      if(activeRoom===room) partySyncStatus.textContent=(message.ok?"":"Party sync rejected: ")+message.message;
+    });
     room.onMessage<PongMessage>(NETWORK_MESSAGES.pong, (message) => {
       if (activeRoom !== room) return;
       const latency = Math.max(0, Date.now() - message.sentAt);
@@ -700,6 +733,7 @@ async function connectToServer(): Promise<void> {
     });
 
     room.onLeave((code) => {
+      if (activeRoom === room) stopPartySync();
       clearTimeout(mapTimeout);
       if (activeRoom !== room) return;
       activeRoom = undefined;
@@ -713,11 +747,13 @@ async function connectToServer(): Promise<void> {
       setStatus("error", message || "The room reported a connection error");
     });
 
+    partySync.sync();
     room.send(NETWORK_MESSAGES.worldSync);
     const ping: PingMessage = { sentAt: Date.now() };
     room.send(NETWORK_MESSAGES.ping, ping);
   } catch (error) {
     if (attempt !== connectionAttempt) return;
+    stopPartySync();
     activeRoom = undefined;
     worldInfo.hidden = true;
     setStatus("error", error instanceof Error ? error.message : "Unable to connect to the game server");

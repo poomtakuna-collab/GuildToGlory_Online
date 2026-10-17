@@ -7,6 +7,9 @@ export const WORLD_HEIGHT = 800;
 export const PLAYER_RADIUS = 16;
 
 export const NETWORK_MESSAGES = {
+  partySnapshot: "party:snapshot",
+  partyState: "party:state",
+  partyResult: "party:result",
   ping: "ping",
   pong: "pong",
   destination: "world:destination",

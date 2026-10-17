@@ -68,3 +68,82 @@ same map data it uses for collision and A*, including embedded PNG assets. Reser
 maps are validated but cannot be entered. Map data is cached until server restart;
 Editor maps remain local copies and are deployed only by manually replacing JSON.
 No database, map transitions or persistent player position are introduced.
+
+## Implemented M5.1 Guild Foundation
+
+`shared/src/guild.ts` owns the versioned Guild model, initial values, name and
+roster validation. RosterAdventurer extends GeneratedAdventurer with an ID without
+changing generator logic. `client/src/guildStorage.ts` exposes a repository over
+an injected storage adapter; loads are read-only and failed validation never resets
+saved data. `client/src/guildSection.ts` owns the form and roster display, while
+main.ts only integrates section navigation. This is an explicit local prototype
+exception to the proposed server-owned economy, not multiplayer authority.
+No recruitment, transactions, party, database or authentication is implemented.
+
+## Implemented M5.2 Recruitment
+
+Shared recruitment.ts produces validated immutable Guild transitions using the
+unchanged generator. The storage repository applies a transition to a fresh load
+and commits one complete snapshot before returning success. Guild UI serializes
+create/update actions using the same Web Lock. Pending actions use the reviewed
+adventurer ID; dismissal confirms that same member. Guild schema 2 reads schema 1
+without resetting it and saves the migration on the next successful write.
+Developer gold is client-only and gated by Vite DEV; no multiplayer protocol changes.
+
+## Implemented M5.3 Active Party
+
+Guild schema 3 validates ID-only activeParty references against the roster,
+capacity, uniqueness and leader membership on every load and transition. Legacy
+schemas 1/2 migrate in memory with an empty party, preserving other Guild data.
+shared/src/party.ts owns immutable add/remove/replace/setLeader/clear transitions
+and derived readiness. Recruitment dismissal removes party references in the same
+transition. The existing repository validates and saves one complete snapshot;
+Guild UI renders success only after storage succeeds and reloads on save failure.
+The panel resolves all character details from the existing roster. This module
+has no World protocol or generator dependency and adds no gameplay integration.
+
+## Implemented M5.3.1 Session Party Identity
+
+localProfile.ts owns a separate persistent UUID key, using a Web Lock on creation
+when supported. Guild schema stays at 3 and existing IDs/economy remain unchanged.
+partyNetwork.ts defines strict minimal snapshot validation and explicit projection
+from Guild data. partySync.ts reloads persisted Guild data for each send and owns
+a monotonic revision counter for one connection. Stopped connections cannot send.
+
+ConnectionRoom owns one PartySessions instance with entries keyed exclusively by
+transport client.sessionId. Each accepted snapshot replaces that session's entry;
+non-increasing revisions and invalid payloads leave it unchanged. onLeave deletes
+that entry. Summaries are broadcast on joins, accepted updates and departure, and
+world:sync provides the current summary set. They omit profile IDs and progression.
+World movement state and authoritative map loading remain independent.
+
+The local identity is a self-asserted prototype label, never authentication or
+permission to operate on another session. Server snapshots are ephemeral display
+data, not persisted or authoritative Guild progression. Corrupt local Guild data
+blocks snapshot sends and is surfaced by the World panel. Existing World navigation
+still disconnects when switching sections; manual sync and cross-tab storage events
+support changes during a connection without creating another session.
+
+## Implemented M5.3.2A Server Database Foundation
+
+server/src/database/database.ts owns the node:sqlite connection, configurable path,
+foreign keys/WAL setup and synchronous transactions with nested savepoints.
+migrations.ts contains versioned SQL migrations and validates applied history;
+version 1 creates players, guilds, adventurers, pending_recruits, active_parties,
+active_party_members and the migration ledger. Pending migrations commit atomically.
+repository.ts binds SQL parameters and validates persisted generated-character data
+using the existing shared parser. It does not generate characters or choose gold.
+
+The database leader FK references party membership and is deferred until commit,
+allowing atomic party replacement. Composite membership FKs enforce Guild identity;
+slot constraints limit a party to four members. Roster removals cascade membership
+and clear a removed leader via a trigger. Caller-level transactions can coordinate
+Guild metadata, roster, pending recruit and party writes; failures roll back.
+Roster capacity and ownership authorization remain future business-layer duties.
+
+Only server startup initializes the database, with no seeding and no repository
+calls from rooms. Existing browser Guild storage and network contracts are untouched.
+A server-only environment setting controls the database location. Vite denies SQLite
+files in development and startup rejects paths within client assets. No database
+module is exported by shared code or imported in the client bundle. This foundation
+has no guest authentication or automatic migration/import from browser profiles.

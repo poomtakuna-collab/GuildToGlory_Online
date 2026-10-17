@@ -34,3 +34,11 @@ desktop.ini
 
 # TypeScript
 *.tsbuildinfo
+# Server SQLite databases and journals
+server/data/
+*.sqlite
+*.sqlite-*
+*.sqlite3
+*.sqlite3-*
+*.db
+*.db-*
